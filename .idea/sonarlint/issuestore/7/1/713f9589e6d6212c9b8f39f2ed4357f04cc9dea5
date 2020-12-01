@@ -1,0 +1,79 @@
+
+X	java:S125="<This block of commented-out lines of code should be removed.(ÀÜÎ8”“ıÇà.
+ 
+java:S1192U"‚Define a constant instead of duplicating this literal "3333333333333333333333333333333333333333333333333333333333333333" 16 times.(•Ğ²Ø8”“ıÇà.
+k
+java:S1128"IRemove this unused import 'org.tron.tronj.proto.Response.BlockExtention'.(îĞ”Üøÿÿÿÿ8”“ıÇà.
+V	java:S106„"9Replace this use of System.out or System.err by a logger.(Œı’è8”“ıÇà.
+[	java:S106“"9Replace this use of System.out or System.err by a logger.(ÿÜııÿÿÿÿ8”“ıÇà.
+V	java:S106š"9Replace this use of System.out or System.err by a logger.(Œı’è8”“ıÇà.
+V	java:S106ÿ"9Replace this use of System.out or System.err by a logger.(ñ«Áß8”“ıÇà.
+Z	java:S106"9Replace this use of System.out or System.err by a logger.(·ì•‡ıÿÿÿÿ8”“ıÇà.
+[	java:S106‰"9Replace this use of System.out or System.err by a logger.(´õ¢úÿÿÿÿ8”“ıÇà.
+^	java:S125Â"<This block of commented-out lines of code should be removed.(Â™†úÿÿÿÿ8”“ıÇà.
+
+java:S1192Ğ"cDefine a constant instead of duplicating this literal "TF17BgPaZYbz8oxbjhriubPDsA7ArKoLX3" 3 times.(Õ›ûš8”“ıÇà.
+g
+java:S1128	"KRemove this unused import 'org.tron.tronj.abi.datatypes.generated.Bytes10'.(´´²68ø™•¡à.
+[	java:S106İ"9Replace this use of System.out or System.err by a logger.(êÚ“óûÿÿÿÿ8”“ıÇà.
+Y	java:S125Ü"<This block of commented-out lines of code should be removed.(ÆßŸ¹8”“ıÇà.
+U	java:S106c"9Replace this use of System.out or System.err by a logger.(Œı’è8”“ıÇà.
+…
+java:S1192W"cDefine a constant instead of duplicating this literal "TVjsyZ7fYF3qLF6BQgPmTEZy1xrNNyVAAA" 3 times.(¼¦®ïùÿÿÿÿ8”“ıÇà.
+V	java:S106Û"9Replace this use of System.out or System.err by a logger.(Ã¸¹¿8”“ıÇà.
+U	java:S106h"9Replace this use of System.out or System.err by a logger.(Ìğº8”“ıÇà.
+U	java:S106o"9Replace this use of System.out or System.err by a logger.(Œı’è8”“ıÇà.
+[	java:S106ç"9Replace this use of System.out or System.err by a logger.(ˆœ•™øÿÿÿÿ8”“ıÇà.
+f
+java:S1192Y"IDefine a constant instead of duplicating this literal "error: " 16 times.(Œı’è8”“ıÇà.
+S
+java:S1481j"1Remove this unused "resourceCode" local variable.(³”²ıúÿÿÿÿ8”“ıÇà.
+„
+java:S1488%"bImmediately return this expression instead of assigning it to the temporary variable "encodedHex".(âó³üûÿÿÿÿ8”“ıÇà.
+V	java:S106ù"9Replace this use of System.out or System.err by a logger.(Œı’è8”“ıÇà.
+V	java:S106â"9Replace this use of System.out or System.err by a logger.(Œı’è8”“ıÇà.
+V	java:S106"9Replace this use of System.out or System.err by a logger.(Œı’è8”“ıÇà.
+U	java:S106t"9Replace this use of System.out or System.err by a logger.(¤º×—8”“ıÇà.
+U	java:S106"9Replace this use of System.out or System.err by a logger.(”„¸8”“ıÇà.
+T	java:S1064"9Replace this use of System.out or System.err by a logger.(œ©‰N8”“ıÇà.
+U	java:S106x"9Replace this use of System.out or System.err by a logger.(ÿ¦•î8”“ıÇà.
+U	java:S106z"9Replace this use of System.out or System.err by a logger.(Œı’è8”“ıÇà.
+^	java:S125»"<This block of commented-out lines of code should be removed.(Ã¢Î¬úÿÿÿÿ8”“ıÇà.
+…
+java:S1192W"cDefine a constant instead of duplicating this literal "TJRabPrwbZy45sbavfcjinPJC18kjpRTv8" 7 times.(¼¦®ïùÿÿÿÿ8”“ıÇà.
+V	java:S106"9Replace this use of System.out or System.err by a logger.(Œı’è8”“ıÇà.
+Y	java:S125Æ"<This block of commented-out lines of code should be removed.(«ÊÅ”8”“ıÇà.
+V	java:S106¢"9Replace this use of System.out or System.err by a logger.(Œı’è8”“ıÇà.
+[	java:S106“"9Replace this use of System.out or System.err by a logger.(Î—­Úúÿÿÿÿ8”“ıÇà.
+V	java:S106Ò"9Replace this use of System.out or System.err by a logger.(Œı’è8”“ıÇà.
+V	java:S106·"9Replace this use of System.out or System.err by a logger.(Œı’è8”“ıÇà.
+^	java:S125Ä"<This block of commented-out lines of code should be removed.(’Ô“ğıÿÿÿÿ8”“ıÇà.
+[	java:S106ß"9Replace this use of System.out or System.err by a logger.(ÄÔĞ¦ÿÿÿÿÿ8”“ıÇà.
+[	java:S106‰"9Replace this use of System.out or System.err by a logger.(âÂÛíüÿÿÿÿ8”“ıÇà.
+Y	java:S125¦"<This block of commented-out lines of code should be removed.(šœ÷8”“ıÇà.
+^	java:S125¾"<This block of commented-out lines of code should be removed.(»ôÚ¼øÿÿÿÿ8”“ıÇà.
+V	java:S106"9Replace this use of System.out or System.err by a logger.(¦“Áë8”“ıÇà.
+V	java:S106„"9Replace this use of System.out or System.err by a logger.(Œı’è8”“ıÇà.
+l
+java:S1128"JRemove this unused import 'org.tron.tronj.abi.datatypes.generated.Uint32'.(©Øàøÿÿÿÿ8ø™•¡à.
+Z	java:S106O"9Replace this use of System.out or System.err by a logger.(€Ù¡‹úÿÿÿÿ8”“ıÇà.
+T	java:S106T"9Replace this use of System.out or System.err by a logger.(‡òÿk8”“ıÇà.
+Z	java:S1066"9Replace this use of System.out or System.err by a logger.(’ƒ§ÿÿÿÿÿ8”“ıÇà.
+U	java:S106P"9Replace this use of System.out or System.err by a logger.(šÉ‰è8”“ıÇà.
+U	java:S106^"9Replace this use of System.out or System.err by a logger.(‡Ì±°8”“ıÇà.
+V	java:S106˜"9Replace this use of System.out or System.err by a logger.(Œı’è8”“ıÇà.
+^	java:S125³"<This block of commented-out lines of code should be removed.(µÉ‘ôÿÿÿÿÿ8”“ıÇà.
+^	java:S125½"<This block of commented-out lines of code should be removed.(×ùÔÁûÿÿÿÿ8”“ıÇà.
+V	java:S106ì"9Replace this use of System.out or System.err by a logger.(Œı’è8”“ıÇà.
+^	java:S125±"<This block of commented-out lines of code should be removed.(èù¦‘şÿÿÿÿ8”“ıÇà.
+V	java:S106µ"9Replace this use of System.out or System.err by a logger.(¬‡ â8”“ıÇà.
+N
+java:S1481÷"+Remove this unused "txnExt" local variable.(Õ¶ú¼ùÿÿÿÿ8”“ıÇà.
+U	java:S106Y"9Replace this use of System.out or System.err by a logger.(Œı’è8”“ıÇà.
+`
+java:S1128"CRemove this unused import 'org.tron.tronj.proto.Chain.BlockHeader'.(ä¼åø8”“ıÇà.
+[	java:S106²"9Replace this use of System.out or System.err by a logger.(¹¢ñøüÿÿÿÿ8”“ıÇà.
+X	java:S125:"<This block of commented-out lines of code should be removed.(Ÿ®ô·8”“ıÇà.
+]
+java:S1854÷":Remove this useless assignment to local variable "txnExt".(Õ¶ú¼ùÿÿÿÿ8”“ıÇà.
+^	java:S125Í"<This block of commented-out lines of code should be removed.(ØñíÏüÿÿÿÿ8½®ÓÉà.

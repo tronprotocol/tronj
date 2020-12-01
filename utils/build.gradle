@@ -1,0 +1,36 @@
+plugins {
+    id 'com.jfrog.bintray'
+}
+
+description 'Minimal set of tronj utility classes'
+
+dependencies {
+    implementation "org.bouncycastle:bcprov-jdk15on:$bouncycastleVersion"
+    implementation 'org.apache.tuweni:tuweni-bytes:1.0.0'
+    implementation 'org.apache.tuweni:tuweni-units:1.0.0'
+}
+
+bintray {
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_KEY')
+
+    configurations = ['archives']
+
+    pkg {
+        repo = 'tronj'
+        name = 'utils'
+        // configurations = ['archives']
+        desc = description
+        websiteUrl = 'https://github.com/tronprotocol/tronj'
+        vcsUrl = 'https://github.com/tronprotocol/tronj.git'
+        licenses = ['Apache-2.0']
+        publish = true
+        publicDownloadNumbers = true
+        version {
+            afterEvaluate {
+                name = "${project.version}"
+                released = new Date()
+            }
+        }
+    }
+}
