@@ -1,0 +1,37 @@
+
+`	java:S112M"FDefine and throw a dedicated exception instead of using a generic one.(Ò‚Òéüÿÿÿÿ
+`	java:S112S"FDefine and throw a dedicated exception instead of using a generic one.(Ò‚Òéüÿÿÿÿ
+[	java:S112í"FDefine and throw a dedicated exception instead of using a generic one.(÷õûv
+l	java:S117ž"QRename this local variable to match the regular expression '^[a-z][a-zA-Z0-9]*$'.(Ë†š–ýÿÿÿÿ
+O
+java:S11188":Add a private constructor to hide the implicit public one.(Í°²0
+H
+java:S1135o"2Complete the task associated to this TODO comment.(·Ë¹
+?
+java:S4274"(Replace this assert with a proper check.(ý´»
+?
+java:S4274œ"(Replace this assert with a proper check.(ƒŽÞ³
+D
+java:S4274"(Replace this assert with a proper check.(à˜½ùÿÿÿÿ
+E
+java:S1948ª")Make "encoded" transient or serializable.(µåèçøÿÿÿÿ
+D
+java:S4274²"(Replace this assert with a proper check.(ÑÎ¼ýÿÿÿÿ
+D
+java:S4274»"(Replace this assert with a proper check.(®™Ê½ÿÿÿÿÿ
+?
+java:S1948î")Make "encoded" transient or serializable.(ÈÖF
+N
+java:S1135ô"2Complete the task associated to this TODO comment.(åÓƒ€üÿÿÿÿ
+D
+java:S4274Œ"(Replace this assert with a proper check.(ÑÎ¼ýÿÿÿÿ
+?
+java:S4274Ù"(Replace this assert with a proper check.(¹”÷—
+?
+java:S4274Ú"(Replace this assert with a proper check.(÷ÊóÚ
+D
+java:S4274­"(Replace this assert with a proper check.(Þœö™ÿÿÿÿÿ
+>
+java:S4274®"(Replace this assert with a proper check.(Î»ú8
+D
+java:S4274Ä"(Replace this assert with a proper check.(“–ÌÎÿÿÿÿÿ
