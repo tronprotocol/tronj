@@ -537,17 +537,6 @@ public class TronClient {
         return blockExtention;
     }
 
-    /*public BlockListExtention getBlockByLatestNumSolidity(long blockNum) throws IllegalNumException {
-        NumberMessage.Builder builder = NumberMessage.newBuilder();
-        builder.setNum(blockNum);
-        BlockListExtention blockListExtention = blockingStubSolidity.getBlockByLatestNum2(builder.build());
-
-        if(blockListExtention.getBlockCount() == 0){
-            throw new IllegalNumException();
-        }
-        return blockListExtention;
-    }*/
-
     /**
      * Get transaction receipt info from a transaction id, must be in solid block
      * @param txID Transaction hash, i.e. transaction id
