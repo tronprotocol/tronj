@@ -487,18 +487,13 @@ public class TronClient {
      * Get account info by address
      * @param address address, default hexString
      * @return Account
-     * @throws IllegalException if the parameters are not correct
      */
-    public Account getAccount(String address) throws IllegalException {
+    public Account getAccount(String address) {
         ByteString bsAddress = parseAddress(address);
         AccountAddressMessage accountAddressMessage = AccountAddressMessage.newBuilder()
                 .setAddress(bsAddress)
                 .build();
         Account account = blockingStub.getAccount(accountAddressMessage);
-
-        if(account.getCreateTime() == 0){
-            throw new IllegalException();
-        }
         return account;
     }
 
@@ -512,24 +507,19 @@ public class TronClient {
         return witnessList;
     }
 
-   //All other solidified APIs start
+    //All other solidified APIs start
 
     /**
      * Get solid account info by address
      * @param address address, default hexString
      * @return Account
-     * @throws IllegalException if the parameters are not correct
      */
-    public Account getAccountSolidity(String address) throws IllegalException {
+    public Account getAccountSolidity(String address) {
         ByteString bsAddress = parseAddress(address);
         AccountAddressMessage accountAddressMessage = AccountAddressMessage.newBuilder()
                 .setAddress(bsAddress)
                 .build();
         Account account = blockingStubSolidity.getAccount(accountAddressMessage);
-
-        if(account.getCreateTime() == 0){
-            throw new IllegalException();
-        }
         return account;
     }
 
@@ -546,6 +536,17 @@ public class TronClient {
         }
         return blockExtention;
     }
+
+    /*public BlockListExtention getBlockByLatestNumSolidity(long blockNum) throws IllegalNumException {
+        NumberMessage.Builder builder = NumberMessage.newBuilder();
+        builder.setNum(blockNum);
+        BlockListExtention blockListExtention = blockingStubSolidity.getBlockByLatestNum2(builder.build());
+
+        if(blockListExtention.getBlockCount() == 0){
+            throw new IllegalNumException();
+        }
+        return blockListExtention;
+    }*/
 
     /**
      * Get transaction receipt info from a transaction id, must be in solid block
@@ -579,7 +580,7 @@ public class TronClient {
         NumberMessage numberMessage = blockingStubSolidity.getRewardInfo(bytesMessage);
         return numberMessage;
     }
-   //All other solidified APIs end
+    //All other solidified APIs end
 
     public static VoteWitnessContract createVoteWitnessContract(ByteString ownerAddress,
                                                                 HashMap<String, String> votes) {
@@ -599,6 +600,7 @@ public class TronClient {
         }
         return builder.build();
     }
+
 
     /*public void transferTrc20(String from, String to, String cntr, long feeLimit, long amount, int precision) {
         System.out.println("============ TRC20 transfer =============");
