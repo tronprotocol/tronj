@@ -2,7 +2,7 @@ package org.tron.tronj.client;
 
 public class IllegalException extends  Exception {
     public IllegalException(){
-        super("The query failed, please check if the parameters are correct.");
+        super("Query failed. Please check the parameters.");
     }
 
     public IllegalException(String message){
