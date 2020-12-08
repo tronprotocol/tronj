@@ -415,7 +415,7 @@ public class TronClient {
         BlockListExtention blockListExtention = blockingStub.getBlockByLatestNum2(numberMessage);
 
         if(blockListExtention.getBlockCount() == 0){
-            throw new IllegalException();
+            throw new IllegalException("The number of latest blocks must be between 1 and 99, please check it.");
         }
         return blockListExtention;
     }

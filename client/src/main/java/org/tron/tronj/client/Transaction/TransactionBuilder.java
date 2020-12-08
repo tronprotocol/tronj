@@ -31,28 +31,21 @@ public class TransactionBuilder {
     }
 
     public TransactionBuilder setFeeLimit(long feeLimit) {
-        transaction.toBuilder()
+        transaction = transaction.toBuilder()
             .setRawData(transaction.getRawData().toBuilder().setFeeLimit(feeLimit))
             .build();
         return this;
     } 
 
-    public TransactionBuilder setPermissionId(int permissionId) {
-        transaction.getRawData().toBuilder()
-            .setContract(0, transaction.getRawData().getContract(0).toBuilder().setPermissionId(permissionId))
-            .build();
-        return this;
-    }
-
     public TransactionBuilder setMemo(byte[] memo) {
-        transaction.toBuilder()
+        transaction = transaction.toBuilder()
             .setRawData(transaction.getRawData().toBuilder().setData(ByteString.copyFrom(memo)))
             .build();
         return this;
     }
 
     public TransactionBuilder setMemo(String memo) {
-        transaction.toBuilder()
+        transaction = transaction.toBuilder()
             .setRawData(transaction.getRawData().toBuilder().setData(ByteString.copyFromUtf8(memo)))
             .build();
         return this;
