@@ -514,10 +514,14 @@ public class App {
         // app.generateAddress();
         // app.getNowBlockSolidity();
         // app.getRewardSolidity();
-        // trc20Demo.getName();
-        // trc20Demo.getSymbol();
-        // trc20Demo.getDecimals();
-        // trc20Demo.getTotalSupply();
+        trc20Demo.getName();
+        trc20Demo.getSymbol();
+        trc20Demo.getDecimals();
+        trc20Demo.getTotalSupply();
         trc20Demo.getBalanceOf();
+        // trc20Demo.transfer();
+        // trc20Demo.transferFrom();
+        // trc20Demo.approve();
+        trc20Demo.getAllowance();
     }
 }
