@@ -20,7 +20,7 @@ import org.tron.tronj.abi.datatypes.generated.Uint256;
 import org.tron.tronj.abi.datatypes.Utf8String;
 import org.tron.tronj.abi.FunctionReturnDecoder;
 import org.tron.tronj.abi.TypeReference;
-import org.tron.tronj.client.Transaction.TransactionBuilder;
+import org.tron.tronj.client.transaction.TransactionBuilder;
 import org.tron.tronj.client.TronClient;
 import org.tron.tronj.proto.Chain.Transaction;
 import org.tron.tronj.proto.Response.TransactionExtention;
