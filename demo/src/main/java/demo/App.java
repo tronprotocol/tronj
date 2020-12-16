@@ -12,7 +12,7 @@ import org.tron.tronj.abi.datatypes.generated.Uint32;
 import org.tron.tronj.abi.datatypes.*;
 import org.tron.tronj.client.contract.Contract;
 import org.tron.tronj.client.contract.ContractFunction;
-import org.tron.tronj.client.Transaction.TransactionBuilder;
+import org.tron.tronj.client.transaction.TransactionBuilder;
 import org.tron.tronj.client.TronClient;
 import org.tron.tronj.proto.Chain.Transaction;
 import org.tron.tronj.proto.Contract.TriggerSmartContract;
@@ -25,6 +25,8 @@ import java.math.BigInteger;
 import java.util.*;
 import org.tron.tronj.proto.Chain.Block;
 import org.tron.tronj.proto.Chain.BlockHeader;
+
+import demo.trc20.Trc20Demo;
 
 public class App {
     public String encodeFunctionCalling() {
@@ -658,6 +660,7 @@ public class App {
         }
     }
 
+
     public static void main(String[] args) {
         App app = new App();
 //        System.out.println(app.encodeFunctionCalling());
@@ -699,14 +702,46 @@ public class App {
 //        app.voteWitness();
 //        app.updateAccount();
 //        app.createAccount();
+        Trc20Demo trc20Demo = new Trc20Demo();
+        // System.out.println(app.encodeFunctionCalling());
+        // app.decodeFunctionReturn();
+        // app.signTransaction();
+        // app.trc20Encode();
+        // app.sendTrx();
+        // app.transferTrc10();
+        // app.sendTrc20();
+        // app.freezeBalance();
+        // app.unFreezeBalance();
+        // app.getBlockByNum();
+        // app.getNowBlock();
+        // app.getNodeInfo();
+        // app.getBlockByLatestNum();
+        // app.listNodes();
+        // app.getTransactionInfoByBlockNum();
+        // app.getTransactionInfoById();
+        // app.getAccount();
+        // app.getAccountSolidity();
+        // app.listWitnesses();
+        // app.getAccount();
+        // app.listWitnesses();
+        // app.voteWitness();
         // app.transferTrc20();
         // app.getSmartContract();
         // app.viewContractName();
-//        app.triggerCallDemo();
-//        app.getAccountSolidity();
-//        app.getTransactionByIdSolidity();
-//        app.generateAddress();
-//        app.getNowBlockSolidity();
-//        app.getRewardSolidity();
+        // app.triggerCallDemo();
+        // app.getAccountSolidity();
+        // app.getTransactionByIdSolidity();
+        // app.generateAddress();
+        // app.getNowBlockSolidity();
+        // app.getRewardSolidity();
+        trc20Demo.getName();
+        trc20Demo.getSymbol();
+        trc20Demo.getDecimals();
+        trc20Demo.getTotalSupply();
+        trc20Demo.getBalanceOf();
+        // trc20Demo.transfer();
+        // trc20Demo.transferFrom();
+        // trc20Demo.approve();
+        trc20Demo.getAllowance();
     }
 }
