@@ -27,19 +27,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Contract {
-    private ByteString originAddr = ByteString.EMPTY;
-    private ByteString cntrAddr = ByteString.EMPTY;
-    private ABI abi;
-    private ByteString bytecode;
-    private long callValue = 0;
-    private long consumeUserResourcePercent = 100;
-    private String name;
-    private long originEnergyLimit = 1;
-    private ByteString codeHash = ByteString.EMPTY;
-    private ByteString trxHash = ByteString.EMPTY;
+    protected ByteString originAddr = ByteString.EMPTY;
+    protected ByteString cntrAddr = ByteString.EMPTY;
+    protected ABI abi;
+    protected ByteString bytecode;
+    protected long callValue = 0;
+    protected long consumeUserResourcePercent = 100;
+    protected String name;
+    protected long originEnergyLimit = 1;
+    protected ByteString codeHash = ByteString.EMPTY;
+    protected ByteString trxHash = ByteString.EMPTY;
     //Current transaction owner's address, to call or trigger contract"
-    private ByteString ownerAddr = ByteString.EMPTY;
-    private List<ContractFunction> functions = new ArrayList();
+    protected ByteString ownerAddr = ByteString.EMPTY;
+    protected List<ContractFunction> functions = new ArrayList();
 
     public Contract(ByteString cntrAddr, ABI abi, ByteString bytecode, long consumeUserResourcePercent, String name, long originEnergyLimit) {
         this.cntrAddr = cntrAddr;
@@ -160,17 +160,17 @@ public class Contract {
     }
 
     public static class Builder {
-        private ByteString originAddr = ByteString.EMPTY;
-        private ByteString cntrAddr = ByteString.EMPTY;
-        private ABI abi;
-        private ByteString bytecode;
-        private long callValue = 0;
-        private long consumeUserResourcePercent = 100;
-        private String name;
-        private long originEnergyLimit = 1;
-        private ByteString codeHash = ByteString.EMPTY;
-        private ByteString trxHash = ByteString.EMPTY;
-        private ByteString ownerAddr = ByteString.EMPTY;
+        protected ByteString originAddr = ByteString.EMPTY;
+        protected ByteString cntrAddr = ByteString.EMPTY;
+        protected ABI abi;
+        protected ByteString bytecode;
+        protected long callValue = 0;
+        protected long consumeUserResourcePercent = 100;
+        protected String name;
+        protected long originEnergyLimit = 1;
+        protected ByteString codeHash = ByteString.EMPTY;
+        protected ByteString trxHash = ByteString.EMPTY;
+        protected ByteString ownerAddr = ByteString.EMPTY;
 
         public Builder setOriginAddr(ByteString originAddr) {
             this.originAddr = originAddr;
@@ -227,7 +227,7 @@ public class Contract {
    * @see org.tron.tronj.proto.Common.SmartContract.ABI.Entry;
    * @see ContractFunction ;
    */
-  private void abiToFunctions() {
+  protected void abiToFunctions() {
         int funcNum = abi.getEntrysCount();
         for (int i = 0; i < funcNum; i++) {
             Entry funcAbi = abi.getEntrysList().get(i);
@@ -256,7 +256,7 @@ public class Contract {
         }
     }
 
-    private List<String> collectParams(List<Param> params, char flag) {
+    protected List<String> collectParams(List<Param> params, char flag) {
         List<String> ret = new ArrayList();
         switch (flag) {
             //p = param, t = type
