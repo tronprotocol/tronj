@@ -38,20 +38,31 @@ import org.tron.tronj.proto.Contract.FreezeBalanceContract;
 import org.tron.tronj.proto.Contract.TransferContract;
 import org.tron.tronj.proto.Contract.VoteWitnessContract;
 import org.tron.tronj.proto.Contract.TriggerSmartContract;
+import org.tron.tronj.proto.Contract.AccountUpdateContract;
+import org.tron.tronj.proto.Contract.AccountCreateContract;
+import org.tron.tronj.proto.Contract.AssetIssueContract;
 import org.tron.tronj.proto.Response.TransactionExtention;
 import org.tron.tronj.proto.Response.TransactionReturn;
 import org.tron.tronj.proto.Response.NodeInfo;
 import org.tron.tronj.proto.Response.WitnessList;
 import org.tron.tronj.proto.Response.BlockExtention;
 import org.tron.tronj.proto.Response.BlockListExtention;
+import org.tron.tronj.proto.Response.Proposal;
+import org.tron.tronj.proto.Response.Exchange;
+import org.tron.tronj.proto.Response.DelegatedResourceMessage;
+import org.tron.tronj.proto.Response.DelegatedResourceList;
+import org.tron.tronj.proto.Response.DelegatedResourceAccountIndex;
 import org.tron.tronj.api.GrpcAPI.NumberMessage;
 import org.tron.tronj.api.GrpcAPI.EmptyMessage;
 import org.tron.tronj.api.GrpcAPI.AccountAddressMessage;
+import org.tron.tronj.api.GrpcAPI.BlockLimit;
+import org.tron.tronj.api.GrpcAPI.PaginatedMessage;
 import org.tron.tronj.utils.Base58Check;
 import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 
 import org.tron.tronj.crypto.tuweniTypes.Bytes32;
@@ -62,10 +73,18 @@ import org.tron.tronj.proto.Response.NodeList;
 import org.tron.tronj.proto.Response.TransactionInfoList;
 import org.tron.tronj.proto.Response.TransactionInfo;
 import org.tron.tronj.proto.Response.Account;
+import org.tron.tronj.proto.Response.AccountResourceMessage;
+import org.tron.tronj.proto.Response.AccountNetMessage;
+import org.tron.tronj.proto.Response.ChainParameters;
+import org.tron.tronj.proto.Response.AssetIssueList;
+import org.tron.tronj.proto.Response.ProposalList;
+import org.tron.tronj.proto.Response.ExchangeList;
 
 import static org.tron.tronj.proto.Response.TransactionReturn.response_code.SUCCESS;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public class TronClient {
     public final WalletGrpc.WalletBlockingStub blockingStub;
@@ -376,6 +395,53 @@ public class TronClient {
     }
 
     /**
+     * Create an account. Uses an already activated account to create a new account
+     * @param ownerAddress owner address, an activated account
+     * @param accountAddress the address of the new account
+     * @return TransactionExtention
+     * IllegalNumException if fail to create account
+     */
+    public TransactionExtention createAccount(String ownerAddress, String accountAddress) throws IllegalException {
+        ByteString bsOwnerAddress = parseAddress(ownerAddress);
+        ByteString bsAccountAddress = parseAddress(accountAddress);
+
+        AccountCreateContract contract = createAccountCreateContract(bsOwnerAddress,
+                bsAccountAddress);
+
+        TransactionExtention transactionExtention= blockingStub.createAccount2(contract);
+
+        if(SUCCESS != transactionExtention.getResult().getCode()){
+            throw new IllegalException(transactionExtention.getResult().getMessage().toStringUtf8());
+        }
+
+        return transactionExtention;
+    }
+
+    /**
+     * Modify account name
+     * @param address owner address
+     * @param accountName the name of the account
+     * @return TransactionExtention
+     * IllegalNumException if fail to update account name
+     */
+    //only if account.getAccountName() == null can update name
+    public TransactionExtention updateAccount(String address, String accountName) throws IllegalException {
+        ByteString bsAddress = parseAddress(address);
+        ByteString bsAccountName = parseAddress(accountName);
+
+        AccountUpdateContract contract = createAccountUpdateContract(bsAccountName,
+                bsAddress);
+
+        TransactionExtention transactionExtention= blockingStub.updateAccount2(contract);
+
+        if(SUCCESS != transactionExtention.getResult().getCode()){
+            throw new IllegalException(transactionExtention.getResult().getMessage().toStringUtf8());
+        }
+
+        return transactionExtention;
+    }
+
+    /**
      * Query the latest block information
      * @return Block
      * @throws IllegalException if fail to get now block
@@ -417,6 +483,26 @@ public class TronClient {
 
         if(blockListExtention.getBlockCount() == 0){
             throw new IllegalException("The number of latest blocks must be between 1 and 99, please check it.");
+        }
+        return blockListExtention;
+    }
+
+    /**
+     * Returns the list of Block Objects included in the 'Block Height' range specified
+     * @param startNum Number of start block height, including this block
+     * @param endNum Number of end block height, excluding this block
+     * @return BlockListExtention
+     * @throws IllegalException if the parameters are not correct
+     */
+    public BlockListExtention getBlockByLimitNext(long startNum, long endNum) throws IllegalException {
+        BlockLimit blockLimit = BlockLimit.newBuilder()
+                .setStartNum(startNum)
+                .setEndNum(endNum)
+                .build();
+        BlockListExtention blockListExtention = blockingStub.getBlockByLimitNext2(blockLimit);
+
+        if(blockListExtention.getBlockCount() == 0){
+            throw new IllegalException();
         }
         return blockListExtention;
     }
@@ -485,6 +571,25 @@ public class TronClient {
     }
 
     /**
+     * Query transaction information by transaction id
+     * @param txID Transaction hash, i.e. transaction id
+     * @return Transaction
+     * @throws IllegalException if the parameters are not correct
+     */
+    public Transaction getTransactionById(String txID) throws IllegalException {
+        ByteString bsTxid = parseAddress(txID);
+        BytesMessage request = BytesMessage.newBuilder()
+                .setValue(bsTxid)
+                .build();
+        Transaction transaction = blockingStub.getTransactionById(request);
+
+        if(transaction.getRetCount() == 0){
+            throw new IllegalException();
+        }
+        return transaction;
+    }
+
+    /**
      * Get account info by address
      * @param address address, default hexString
      * @return Account
@@ -499,6 +604,169 @@ public class TronClient {
     }
 
     /**
+     * Query the resource information of an account(bandwidth,energy,etc)
+     * @param address address, default hexString
+     * @return AccountResourceMessage
+     */
+    public AccountResourceMessage getAccountResource(String address) {
+        ByteString bsAddress = parseAddress(address);
+        AccountAddressMessage account = AccountAddressMessage.newBuilder()
+                .setAddress(bsAddress)
+                .build();
+        return blockingStub.getAccountResource(account);
+    }
+
+    /**
+     * Query bandwidth information
+     * @param address address, default hexString
+     * @return AccountResourceMessage
+     */
+    public AccountNetMessage getAccountNet(String address) {
+        ByteString bsAddress = parseAddress(address);
+        AccountAddressMessage account = AccountAddressMessage.newBuilder()
+                .setAddress(bsAddress)
+                .build();
+        return blockingStub.getAccountNet(account);
+    }
+
+    /**
+     * All parameters that the blockchain committee can set
+     * @return ChainParameters
+     * @throws IllegalException if fail to get chain parameters
+     */
+    public ChainParameters getChainParameters() throws IllegalException {
+        ChainParameters chainParameters = blockingStub.getChainParameters(EmptyMessage.newBuilder().build());
+
+        if(chainParameters.getChainParameterCount() == 0){
+            throw new IllegalException("Fail to get chain parameters.");
+        }
+        return chainParameters;
+    }
+
+    /**
+     * Returns all resources delegations from an account to another account. The fromAddress can be retrieved from the GetDelegatedResourceAccountIndex API
+     * @param fromAddress energy from address,, default hexString
+     * @param toAddress energy delegation information, default hexString
+     * @return DelegatedResourceList
+     */
+    public DelegatedResourceList getDelegatedResource(String fromAddress,
+                                                                String toAddress) {
+
+        ByteString fromAddressBS = parseAddress(fromAddress);
+        ByteString toAddressBS = parseAddress(toAddress);
+
+        DelegatedResourceMessage request = DelegatedResourceMessage.newBuilder()
+                .setFromAddress(fromAddressBS)
+                .setToAddress(toAddressBS)
+                .build();
+        DelegatedResourceList delegatedResource = blockingStub.getDelegatedResource(request);
+        return delegatedResource;
+    }
+
+    /**
+     * Query the energy delegation by an account. i.e. list all addresses that have delegated resources to an account
+     * @param address address,, default hexString
+     * @return DelegatedResourceAccountIndex
+     */
+    public DelegatedResourceAccountIndex getDelegatedResourceAccountIndex(String address) {
+
+        ByteString addressBS = parseAddress(address);
+
+        BytesMessage bytesMessage = BytesMessage.newBuilder()
+                .setValue(addressBS)
+                .build();
+
+        DelegatedResourceAccountIndex accountIndex = blockingStub.getDelegatedResourceAccountIndex(bytesMessage);
+        return accountIndex;
+    }
+
+    /**
+     * Query the list of all the TRC10 tokens
+     * @return AssetIssueList
+     */
+    public AssetIssueList getAssetIssueList() {
+        AssetIssueList assetIssueList = blockingStub.getAssetIssueList(EmptyMessage.newBuilder().build());
+
+        return assetIssueList;
+    }
+
+    /**
+     * Query the list of all the tokens by pagination.
+     * @param offset the index of the start token
+     * @param limit the amount of tokens per page
+     * @return AssetIssueList, a list of Tokens that succeed the Token located at offset
+     */
+    public AssetIssueList getPaginatedAssetIssueList(long offset, long limit) {
+        PaginatedMessage pageMessage = PaginatedMessage.newBuilder()
+                .setOffset(offset)
+                .setLimit(limit)
+                .build();
+
+        AssetIssueList assetIssueList = blockingStub.getPaginatedAssetIssueList(pageMessage);
+        return assetIssueList;
+    }
+
+    /**
+     * Query the TRC10 token information issued by an account
+     * @param address the Token Issuer account address
+     * @return AssetIssueList, a list of Tokens that succeed the Token located at offset
+     */
+    public AssetIssueList getAssetIssueByAccount(String address) {
+        ByteString addressBS = parseAddress(address);
+        AccountAddressMessage request = AccountAddressMessage.newBuilder()
+                .setAddress(addressBS)
+                .build();
+        AssetIssueList assetIssueList = blockingStub.getAssetIssueByAccount(request);
+        return assetIssueList;
+    }
+
+    /**
+     * Query a token by token id
+     * @param assetId the ID of the TRC10 token
+     * @return AssetIssueContract, the token object, which contains the token name
+     */
+    public AssetIssueContract getAssetIssueById(String assetId) {
+        ByteString assetIdBs = ByteString.copyFrom(assetId.getBytes());
+        BytesMessage request = BytesMessage.newBuilder()
+                .setValue(assetIdBs)
+                .build();
+
+        AssetIssueContract assetIssueContract = blockingStub.getAssetIssueById(request);
+        return assetIssueContract;
+    }
+
+    /**
+     * List all proposals
+     * @return ProposalList
+     */
+    public ProposalList listProposals() {
+        ProposalList proposalList = blockingStub.listProposals(EmptyMessage.newBuilder().build());
+
+        return proposalList;
+    }
+
+    /**
+     * Query proposal based on ID
+     * @param id proposal id
+     * @return Proposal, proposal details
+     * @throws IllegalException if fail to get proposal
+     */
+    //1-17
+    public Proposal getProposalById(String id) throws IllegalException {
+        ByteString bsTxid = ByteString.copyFrom(ByteBuffer.allocate(8).putLong(Long.parseLong(id)).array());
+
+        BytesMessage request = BytesMessage.newBuilder()
+                .setValue(bsTxid)
+                .build();
+        Proposal proposal = blockingStub.getProposalById(request);
+
+        if(proposal.getApprovalsCount() == 0){
+            throw new IllegalException();
+        }
+        return proposal;
+    }
+
+    /**
      * List all witnesses that current API node is connected to
      * @return WitnessList
      */
@@ -506,6 +774,36 @@ public class TronClient {
         WitnessList witnessList = blockingStub
                 .listWitnesses(EmptyMessage.newBuilder().build());
         return witnessList;
+    }
+
+    /**
+     * List all exchange pairs
+     * @return ExchangeList
+     */
+    public ExchangeList listExchanges() {
+        ExchangeList exchangeList = blockingStub
+                .listExchanges(EmptyMessage.newBuilder().build());
+        return exchangeList;
+    }
+
+    /**
+     * Query exchange pair based on id
+     * @param id transaction pair id
+     * @return Exchange
+     * @throws IllegalException if fail to get exchange pair
+     */
+    public Exchange getExchangeById(String id) throws IllegalException {
+        ByteString bsTxid = ByteString.copyFrom(ByteBuffer.allocate(8).putLong(Long.parseLong(id)).array());
+
+        BytesMessage request = BytesMessage.newBuilder()
+                .setValue(bsTxid)
+                .build();
+        Exchange exchange = blockingStub.getExchangeById(request);
+
+        if(exchange.getSerializedSize() == 0){
+            throw new IllegalException();
+        }
+        return exchange;
     }
 
     //All other solidified APIs start
@@ -588,6 +886,25 @@ public class TronClient {
             voteBuilder.setVoteCount(count);
             builder.addVotes(voteBuilder.build());
         }
+        return builder.build();
+    }
+
+    public static AccountUpdateContract createAccountUpdateContract(ByteString accountName,
+                                                                    ByteString address) {
+        AccountUpdateContract.Builder builder = AccountUpdateContract.newBuilder();
+
+        builder.setAccountName(accountName);
+        builder.setOwnerAddress(address);
+
+        return builder.build();
+    }
+
+    public static AccountCreateContract createAccountCreateContract(
+            ByteString owner, ByteString address) {
+        AccountCreateContract.Builder builder = AccountCreateContract.newBuilder();
+        builder.setOwnerAddress(owner);
+        builder.setAccountAddress(address);
+
         return builder.build();
     }
 
