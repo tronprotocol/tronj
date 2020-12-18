@@ -645,6 +645,7 @@ public class TronClient {
 
             Contract contract =
                 new Contract.Builder()
+                .setOriginAddr(cntr.getOriginAddress())
                 .setCntrAddr(cntr.getContractAddress())
                 .setBytecode(cntr.getBytecode())
                 .setName(cntr.getName())
