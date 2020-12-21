@@ -1,91 +1,102 @@
 package demo.trc20;
 
 import org.tron.tronj.client.Trc20Client;
+import org.tron.tronj.client.TronClient;
+import org.tron.tronj.client.contract.Contract;
+import org.tron.tronj.client.contract.Trc20Contract;
 
 public class Trc20Demo {
 
+    TronClient c = TronClient.ofNile("Private key");
+
     public void getName() {
-        Trc20Client client = Trc20Client.ofNile("7c3a547f37cf82c7bd7cead99e53fd9a7d3bf6a3c8bd3c8541ad572322d16e42");
+        Contract cntr = c.getContract("Contract address");
+        Trc20Contract token = new Trc20Contract(cntr, "Caller address", c);
         try {
-            System.out.println("Name: " + client.getName("TFRgpvvNTe8bwC666D6orYhEkCcYsbax8U", "TF17BgPaZYbz8oxbjhriubPDsA7ArKoLX3"));
+            System.out.println("Name: " + token.name());
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
 
     public void getSymbol() {
-        Trc20Client client = Trc20Client.ofNile("7c3a547f37cf82c7bd7cead99e53fd9a7d3bf6a3c8bd3c8541ad572322d16e42");
+        Contract cntr = c.getContract("Contract address");
+        Trc20Contract token = new Trc20Contract(cntr, "Caller address", c);
         try {
-            System.out.println("Symbol: " + client.getSymbol("TFRgpvvNTe8bwC666D6orYhEkCcYsbax8U", "TF17BgPaZYbz8oxbjhriubPDsA7ArKoLX3"));
+            System.out.println("Symbol: " + token.symbol());
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
 
     public void getDecimals() {
-        Trc20Client client = Trc20Client.ofNile("7c3a547f37cf82c7bd7cead99e53fd9a7d3bf6a3c8bd3c8541ad572322d16e42");
+        Contract cntr = c.getContract("Contract address");
+        Trc20Contract token = new Trc20Contract(cntr, "Caller address", c);
         try {
-            System.out.println("Decimals: "+ client.getDecimals("TFRgpvvNTe8bwC666D6orYhEkCcYsbax8U", "TF17BgPaZYbz8oxbjhriubPDsA7ArKoLX3"));
+            System.out.println("Decimals: " + token.decimals());
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
 
     public void getTotalSupply() {
-        Trc20Client client = Trc20Client.ofNile("7c3a547f37cf82c7bd7cead99e53fd9a7d3bf6a3c8bd3c8541ad572322d16e42");
+        Contract cntr = c.getContract("Contract address");
+        Trc20Contract token = new Trc20Contract(cntr, "Caller address", c);
         try {
-            System.out.println("TotalSupply: " + client.getTotalSupply("TFRgpvvNTe8bwC666D6orYhEkCcYsbax8U", "TF17BgPaZYbz8oxbjhriubPDsA7ArKoLX3"));
+            System.out.println("Total Supply: " + token.totalSupply());
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
 
     public void getBalanceOf() {
-        Trc20Client client = Trc20Client.ofNile("7c3a547f37cf82c7bd7cead99e53fd9a7d3bf6a3c8bd3c8541ad572322d16e42");
+        Contract cntr = c.getContract("Contract address");
+        Trc20Contract token = new Trc20Contract(cntr, "Caller address", c);
         try {
-            System.out.println("Balance: " + client.getBalanceOf("TFRgpvvNTe8bwC666D6orYhEkCcYsbax8U", "TFRgpvvNTe8bwC666D6orYhEkCcYsbax8U", "TF17BgPaZYbz8oxbjhriubPDsA7ArKoLX3"));
+            System.out.println("Balance: " + token.balanceOf("Caller address"));
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
 
     public void transfer() {
-        Trc20Client client = Trc20Client.ofNile("7c3a547f37cf82c7bd7cead99e53fd9a7d3bf6a3c8bd3c8541ad572322d16e42");
+        Contract cntr = c.getContract("Contract address");
+        Trc20Contract token = new Trc20Contract(cntr, "Caller address", c);
         try {
-            // destnation address, amount, caller/from address, contract address, memo, feelimit
-            System.out.println(client.transfer("TVw7mwc6vg9BxouG98Z2cS1tiwEvhx45TH", 10L, "TFRgpvvNTe8bwC666D6orYhEkCcYsbax8U", 
-                "TF17BgPaZYbz8oxbjhriubPDsA7ArKoLX3", "go!", 100000000L));
+            // destnation address, amount, memo, feelimit
+            System.out.println(token.transfer("To address", 10L, "go!", 100000000L));
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
 
     public void transferFrom() {
-        Trc20Client client = Trc20Client.ofNile("7c3a547f37cf82c7bd7cead99e53fd9a7d3bf6a3c8bd3c8541ad572322d16e42");
+        Contract cntr = c.getContract("Contract address");
+        Trc20Contract token = new Trc20Contract(cntr, "Caller address", c);
         try {
-            // destnation address, amount, caller/from address, contract address, memo, feelimit
-            System.out.println(client.transferFrom("TFRgpvvNTe8bwC666D6orYhEkCcYsbax8U" ,"TVw7mwc6vg9BxouG98Z2cS1tiwEvhx45TH", 10L, "TFRgpvvNTe8bwC666D6orYhEkCcYsbax8U", 
-                "TF17BgPaZYbz8oxbjhriubPDsA7ArKoLX3", "go!", 100000000L));
+            // destnation address, amount, memo, feelimit
+            System.out.println(token.transferFrom("From Address", "To address", 10L, "go!", 100000000L));
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
 
     public void approve() {
-        Trc20Client client = Trc20Client.ofNile("7c3a547f37cf82c7bd7cead99e53fd9a7d3bf6a3c8bd3c8541ad572322d16e42");
+        Contract cntr = c.getContract("Contract address");
+        Trc20Contract token = new Trc20Contract(cntr, "Caller address", c);
         try {
-            // destnation address, amount, caller/from address, contract address, memo, feelimit
-            System.out.println(client.approve("TVw7mwc6vg9BxouG98Z2cS1tiwEvhx45TH", 10L, "TFRgpvvNTe8bwC666D6orYhEkCcYsbax8U", 
-                "TF17BgPaZYbz8oxbjhriubPDsA7ArKoLX3", "go!", 100000000L));
+            // destnation address, amount, memo, feelimit
+            System.out.println(token.approve("Spender", 10L, "go!", 100000000L));
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
     }
 
     public void getAllowance() {
-        Trc20Client client = Trc20Client.ofNile("7c3a547f37cf82c7bd7cead99e53fd9a7d3bf6a3c8bd3c8541ad572322d16e42");
+        Contract cntr = c.getContract("Contract address");
+        Trc20Contract token = new Trc20Contract(cntr, "Caller address", c);
         try {
-            System.out.println("Allowance: " + client.getAllowance("TFRgpvvNTe8bwC666D6orYhEkCcYsbax8U", "TVw7mwc6vg9BxouG98Z2cS1tiwEvhx45TH", "TFRgpvvNTe8bwC666D6orYhEkCcYsbax8U", "TF17BgPaZYbz8oxbjhriubPDsA7ArKoLX3"));
+            System.out.println("Allowance: " + token.allowance("From address", "Spender"));
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }

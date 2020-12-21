@@ -1024,7 +1024,7 @@ public class TronClient {
      * @return TransactionExtention.
      * @throws RuntimeException if function cannot be found in the contract.
      */
-    public TransactionExtention constantCall(String ownerAddr, String contractAddr, Function function) throws Exception{
+    public TransactionExtention constantCall(String ownerAddr, String contractAddr, Function function) {
         Contract cntr = getContract(contractAddr);
         if (isFuncInContract(cntr, function)) {
             return callWithoutBroadcast(ownerAddr, cntr, function);
@@ -1041,7 +1041,7 @@ public class TronClient {
      * @return transaction builder. Users may set other fields, e.g. feeLimit
      * @throws RuntimeException if function cannot be found in the contract
      */
-    public TransactionBuilder triggerCall(String ownerAddr, String contractAddr, Function function) throws Exception {
+    public TransactionBuilder triggerCall(String ownerAddr, String contractAddr, Function function) {
         Contract cntr = getContract(contractAddr);
         if (isFuncInContract(cntr, function)) {
             TransactionExtention txnExt = callWithoutBroadcast(ownerAddr, cntr, function);
