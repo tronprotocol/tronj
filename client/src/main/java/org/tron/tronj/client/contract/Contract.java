@@ -16,6 +16,7 @@ package org.tron.tronj.client.contract;
  */
 
 import com.google.protobuf.ByteString;
+import org.tron.tronj.client.TronClient;
 import org.tron.tronj.proto.Chain.Transaction;
 import org.tron.tronj.proto.Common.SmartContract;
 import org.tron.tronj.proto.Common.SmartContract.ABI;
@@ -27,6 +28,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Contract {
+    protected TronClient client;
     protected ByteString originAddr = ByteString.EMPTY;
     protected ByteString cntrAddr = ByteString.EMPTY;
     protected ABI abi;
@@ -40,6 +42,21 @@ public class Contract {
     //Current transaction owner's address, to call or trigger contract"
     protected ByteString ownerAddr = ByteString.EMPTY;
     protected List<ContractFunction> functions = new ArrayList();
+
+    public Contract(Contract cntr, String ownerAddr, TronClient client) {
+        this.originAddr = cntr.getOriginAddr();
+        this.cntrAddr = cntr.getCntrAddr();
+        this.abi = cntr.getAbi();
+        this.bytecode = cntr.getBytecode();
+        this.callValue = cntr.getCallValue();
+        this.consumeUserResourcePercent = cntr.getConsumeUserResourcePercent();
+        this.name = cntr.getName();
+        this.originEnergyLimit = cntr.getOriginEnergyLimit();
+        this.codeHash = cntr.getCodeHash();
+        this.trxHash = cntr.getTrxHash();
+        this.ownerAddr = TronClient.parseAddress(ownerAddr);
+        this.client = client;
+    }
 
     public Contract(ByteString cntrAddr, ABI abi, ByteString bytecode, long consumeUserResourcePercent, String name, long originEnergyLimit) {
         this.cntrAddr = cntrAddr;
@@ -324,4 +341,6 @@ public class Contract {
 
         return builder.build();
     }
+
+    
 }
