@@ -1,13 +1,13 @@
-package org.tron.tronj.client;
+package org.tron.tronj.client.contract;
 
 /**
- * The {@code Trc20Client} class wraps the TRC-20 standard function calls defined in TIP-20.
+ * The {@code Trc20Contract} is a wrapper class of a standard TRC-20 smart contract.
  * 
- * <p> The {@code Trc20Client} class includes already written smart contract functions. You may call 
- * these functions simply by the methods inside the {@code TronClient} class.
- * Note that the function whose name starts with 'get' are constant calls.</p>
+ * <p>A {@code Trc20Contract} object includes standard TRC-20 functions defined 
+ * in TIP-20. Each {@code Trc20Contract} binds a {@link TronClient} with specific 
+ * caller's private key and address.</p>
  * 
- * @since jdk13.0.2+8
+ * @since jdk 13.0.2+8
  * @see org.tron.tronj.client.TronClient
  * @see org.tron.tronj.abi.datatypes.Function
  */
@@ -25,6 +25,7 @@ import org.tron.tronj.client.TronClient;
 import org.tron.tronj.proto.Chain.Transaction;
 import org.tron.tronj.proto.Response.TransactionExtention;
 import org.tron.tronj.proto.Response.TransactionReturn;
+import org.tron.tronj.utils.Base58Check;
 import org.tron.tronj.utils.Numeric;
 
 import com.google.protobuf.ByteString;
@@ -33,39 +34,27 @@ import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.Collections;
 
- public class Trc20Client {
-     private TronClient client;
+public class Trc20Contract extends Contract {
+    protected int decimals;
 
-     public Trc20Client(String grpcEndpoint, String grpcEndpointSolidity, String hexPrivateKey) {
-         client = new TronClient(grpcEndpoint, grpcEndpointSolidity, hexPrivateKey);
-     }
+    public Trc20Contract(Contract cntr, String ownerAddr, TronClient client) {
+        super(cntr, ownerAddr, client);
+        decimals = decimals().intValue();
+    }
 
-     public static Trc20Client ofMainnet(String hexPrivateKey) {
-         return new Trc20Client("grpc.trongrid.io:50051", "grpc.trongrid.io:50052",hexPrivateKey);
-     }
-
-     public static  Trc20Client ofShasta(String hexPrivateKey) {
-         return new Trc20Client("grpc.shasta.trongrid.io:50051", "grpc.shasta.trongrid.io:50052", hexPrivateKey);
-     }
-
-     public static Trc20Client ofNile(String hexPrivateKey) {
-        return new Trc20Client("47.252.19.181:50051", "47.252.19.181:50061", hexPrivateKey);
-     }
-
-     /**
+    /**
       * Call function name() public view returns (string).
       *
       * Returns the name of the token - e.g. "MyToken".
       *
-      * @param callerAddr The caller's address
-      * @param cntrAddr The contract's address
       * @return A TransactionExtention object contains constant result to resolve
       */
-     public String getName(String callerAddr, String cntrAddr) throws Exception{
+      public String name() {
         Function name = new Function("name",
                 Collections.emptyList(), Arrays.asList(new TypeReference<Utf8String>() {}));
 
-        TransactionExtention txnExt = client.constantCall(callerAddr, cntrAddr, name);
+        TransactionExtention txnExt = client.constantCall(Base58Check.bytesToBase58(ownerAddr.toByteArray()), 
+                Base58Check.bytesToBase58(cntrAddr.toByteArray()), name);
         //Convert constant result to human readable text
         String result = Numeric.toHexString(txnExt.getConstantResult(0).toByteArray());
         return (String)FunctionReturnDecoder.decode(result, name.getOutputParameters()).get(0).getValue();
@@ -76,15 +65,14 @@ import java.util.Collections;
       *
       * Returns the symbol of the token. E.g. "HIX".
       *
-      * @param callerAddr The caller's address
-      * @param cntrAddr The contract's address
       * @return A TransactionExtention object contains constant result to resolve
       */
-      public String getSymbol(String callerAddr, String cntrAddr) throws Exception {
+      public String symbol() {
         Function symbol = new Function("symbol",
                 Collections.emptyList(), Arrays.asList(new TypeReference<Utf8String>() {}));
 
-        TransactionExtention txnExt = client.constantCall(callerAddr, cntrAddr, symbol);
+        TransactionExtention txnExt = client.constantCall(Base58Check.bytesToBase58(ownerAddr.toByteArray()), 
+                Base58Check.bytesToBase58(cntrAddr.toByteArray()), symbol);
         //Convert constant result to human readable text
         String result = Numeric.toHexString(txnExt.getConstantResult(0).toByteArray());
         return (String)FunctionReturnDecoder.decode(result, symbol.getOutputParameters()).get(0).getValue();
@@ -96,15 +84,14 @@ import java.util.Collections;
        * Returns the number of decimals the token uses - e.g. 8, 
        * means to divide the token amount by 100000000 to get its user representation
        * 
-       * @param callerAddr The caller's address
-       * @param cntrAddr The contract's address
        * @return A TransactionExtention object contains constant result to resolve
        */
-      public BigInteger getDecimals(String callerAddr, String cntrAddr) throws Exception {
+      public BigInteger decimals() {
         Function decimals = new Function("decimals",
                 Collections.emptyList(), Arrays.asList(new TypeReference<Uint8>() {}));
         
-        TransactionExtention txnExt = client.constantCall(callerAddr, cntrAddr, decimals);
+        TransactionExtention txnExt = client.constantCall(Base58Check.bytesToBase58(ownerAddr.toByteArray()), 
+                Base58Check.bytesToBase58(cntrAddr.toByteArray()), decimals);
         //Convert constant result to human readable text
         String result = Numeric.toHexString(txnExt.getConstantResult(0).toByteArray());
         return (BigInteger)FunctionReturnDecoder.decode(result, decimals.getOutputParameters()).get(0).getValue();
@@ -115,15 +102,14 @@ import java.util.Collections;
        * 
        * Returns the total token supply.
        * 
-       * @param callerAddr The caller's address
-       * @param cntrAddr The contract's address
        * @return A TransactionExtention object contains constant result to resolve
        */
-      public BigInteger getTotalSupply(String callerAddr, String cntrAddr) throws Exception {
+      public BigInteger totalSupply() {
         Function totalSupply = new Function("totalSupply",
                 Collections.emptyList(), Arrays.asList(new TypeReference<Uint256>() {}));
 
-        TransactionExtention txnExt = client.constantCall(callerAddr, cntrAddr, totalSupply);
+        TransactionExtention txnExt = client.constantCall(Base58Check.bytesToBase58(ownerAddr.toByteArray()), 
+                Base58Check.bytesToBase58(cntrAddr.toByteArray()), totalSupply);
         //Convert constant result to human readable text
         String result = Numeric.toHexString(txnExt.getConstantResult(0).toByteArray());
         return (BigInteger)FunctionReturnDecoder.decode(result, totalSupply.getOutputParameters()).get(0).getValue();
@@ -134,16 +120,17 @@ import java.util.Collections;
        * 
        * Returns the account balance of another account with address _owner.
        * 
-       * @param ownerAddr The token owner's address
+       * @param accountAddr The token owner's address
        * @param callerAddr The caller's address
        * @param cntrAddr The contract's address
        * @return A TransactionExtention object contains constant result to resolve
        */
-      public BigInteger getBalanceOf(String ownerAddr, String callerAddr, String cntrAddr) throws Exception {
+      public BigInteger balanceOf(String accountAddr) {
         Function balanceOf = new Function("balanceOf",
-                Arrays.asList(new Address(ownerAddr)), Arrays.asList(new TypeReference<Uint256>() {}));
+                Arrays.asList(new Address(accountAddr)), Arrays.asList(new TypeReference<Uint256>() {}));
 
-        TransactionExtention txnExt = client.constantCall(callerAddr, cntrAddr, balanceOf);
+        TransactionExtention txnExt = client.constantCall(Base58Check.bytesToBase58(ownerAddr.toByteArray()), 
+                Base58Check.bytesToBase58(cntrAddr.toByteArray()), balanceOf);
         //Convert constant result to human readable text
         String result = Numeric.toHexString(txnExt.getConstantResult(0).toByteArray());
         return (BigInteger)FunctionReturnDecoder.decode(result, balanceOf.getOutputParameters()).get(0).getValue();
@@ -156,20 +143,19 @@ import java.util.Collections;
        * 
        * @param destAddr The address to receive the token
        * @param amount The transfer amount
-       * @param callerAddr The caller's address
-       * @param cntrAddr The contract's address
        * @param memo The transaction memo
        * @param feeLimit The energy fee limit
        * @return A TransactionReturn object contains the trigger result(true / false)
        */
       public TransactionReturn transfer(String destAddr, long amount, 
-             String callerAddr, String cntrAddr, String memo, long feeLimit) throws Exception {
+             String memo, long feeLimit) {
         Function transfer = new Function("transfer",
                 Arrays.asList(new Address(destAddr),
-                        new Uint256(BigInteger.valueOf(amount).multiply(BigInteger.valueOf(10).pow(18)))),
+                        new Uint256(BigInteger.valueOf(amount).multiply(BigInteger.valueOf(10).pow(decimals)))),
                 Arrays.asList(new TypeReference<Bool>() {}));
 
-        TransactionBuilder builder = client.triggerCall(callerAddr, cntrAddr, transfer);
+        TransactionBuilder builder = client.triggerCall(Base58Check.bytesToBase58(ownerAddr.toByteArray()), 
+                Base58Check.bytesToBase58(cntrAddr.toByteArray()), transfer);
         builder.setFeeLimit(feeLimit);
         builder.setMemo(memo);
 
@@ -187,20 +173,19 @@ import java.util.Collections;
        * @param fromAddr The address who sends tokens (or the address to withdraw from)
        * @param destAddr The address to receive the token
        * @param amount The transfer amount
-       * @param callerAddr The caller's address
-       * @param cntrAddr The contract's address
        * @param memo The transaction memo
        * @param feeLimit The energy fee limit
        * @return A TransactionReturn object contains the trigger result(true / false)
        */
       public TransactionReturn transferFrom(String fromAddr, String destAddr, long amount, 
-             String callerAddr, String cntrAddr, String memo, long feeLimit) throws Exception {
+             String memo, long feeLimit) {
         Function transferFrom = new Function("transferFrom",
                 Arrays.asList(new Address(fromAddr) ,new Address(destAddr),
-                        new Uint256(BigInteger.valueOf(amount).multiply(BigInteger.valueOf(10).pow(18)))),
+                        new Uint256(BigInteger.valueOf(amount).multiply(BigInteger.valueOf(10).pow(decimals)))),
                 Arrays.asList(new TypeReference<Bool>() {}));
 
-        TransactionBuilder builder = client.triggerCall(callerAddr, cntrAddr, transferFrom);
+        TransactionBuilder builder = client.triggerCall(Base58Check.bytesToBase58(ownerAddr.toByteArray()), 
+                Base58Check.bytesToBase58(cntrAddr.toByteArray()), transferFrom);
         builder.setFeeLimit(feeLimit);
         builder.setMemo(memo);
 
@@ -216,20 +201,19 @@ import java.util.Collections;
        * 
        * @param spender The address who is allowed to withdraw.
        * @param amount The amount allowed to withdraw.
-       * @param callerAddr The caller's address
-       * @param cntrAddr The contract's address
        * @param memo The transaction memo
        * @param feeLimit The energy fee limit
        * @return A TransactionReturn object contains the trigger result(true / false)
        */
       public TransactionReturn approve(String spender ,long amount, 
-             String callerAddr, String cntrAddr, String memo, long feeLimit) throws Exception {
+             String memo, long feeLimit) {
         Function approve = new Function("approve",
                 Arrays.asList(new Address(spender) ,
-                        new Uint256(BigInteger.valueOf(amount).multiply(BigInteger.valueOf(10).pow(18)))),
+                        new Uint256(BigInteger.valueOf(amount).multiply(BigInteger.valueOf(10).pow(decimals)))),
                 Arrays.asList(new TypeReference<Bool>() {}));
 
-        TransactionBuilder builder = client.triggerCall(callerAddr, cntrAddr, approve);
+                TransactionBuilder builder = client.triggerCall(Base58Check.bytesToBase58(ownerAddr.toByteArray()), 
+                Base58Check.bytesToBase58(cntrAddr.toByteArray()), approve);
         builder.setFeeLimit(feeLimit);
         builder.setMemo(memo);
 
@@ -248,15 +232,16 @@ import java.util.Collections;
        * @param cntrAddr The contract's address
        * @return A TransactionExtention object contains constant result to resolve
        */
-      public BigInteger getAllowance(String owner, String spender,
-             String callerAddr, String cntrAddr) throws Exception {
+      public BigInteger allowance(String owner, String spender) {
         Function allowance = new Function("allowance",
                 Arrays.asList(new Address(owner), new Address(spender)),
                 Arrays.asList(new TypeReference<Uint256>() {}));
         
-        TransactionExtention txnExt = client.constantCall(callerAddr, cntrAddr, allowance);
+        TransactionExtention txnExt = client.constantCall(Base58Check.bytesToBase58(ownerAddr.toByteArray()), 
+                Base58Check.bytesToBase58(cntrAddr.toByteArray()), allowance);
         //Convert constant result to human readable text
         String result = Numeric.toHexString(txnExt.getConstantResult(0).toByteArray());
         return (BigInteger)FunctionReturnDecoder.decode(result, allowance.getOutputParameters()).get(0).getValue();
       }
- }
+
+}
