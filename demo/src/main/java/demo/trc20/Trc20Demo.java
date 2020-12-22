@@ -1,6 +1,5 @@
 package demo.trc20;
 
-import org.tron.tronj.client.Trc20Client;
 import org.tron.tronj.client.TronClient;
 import org.tron.tronj.client.contract.Contract;
 import org.tron.tronj.client.contract.Trc20Contract;
