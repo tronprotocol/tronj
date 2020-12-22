@@ -53,7 +53,7 @@ public class Trc20Demo {
         Contract cntr = c.getContract("Contract address");
         Trc20Contract token = new Trc20Contract(cntr, "Caller address", c);
         try {
-            System.out.println("Balance: " + token.balanceOf("Caller address"));
+            System.out.println("Balance: " + token.balanceOf("Owner address"));
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
