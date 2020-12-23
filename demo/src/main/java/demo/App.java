@@ -20,12 +20,19 @@ import org.tron.tronj.proto.Response.BlockExtention;
 import org.tron.tronj.proto.Response.BlockListExtention;
 import org.tron.tronj.proto.Response.TransactionExtention;
 import org.tron.tronj.proto.Response.TransactionReturn;
-
+import org.tron.tronj.abi.datatypes.Function;
+import org.tron.tronj.abi.datatypes.StaticArray;
+import org.tron.tronj.abi.datatypes.Type;
+import org.tron.tronj.abi.datatypes.generated.Uint256;
+import org.tron.tronj.api.GrpcAPI.BytesMessage;
 import java.math.BigInteger;
 import java.util.*;
 import org.tron.tronj.proto.Chain.Block;
 import org.tron.tronj.proto.Chain.BlockHeader;
 
+import org.tron.tronj.proto.Response.DelegatedResourceAccountIndex;
+import org.tron.tronj.utils.Base58Check;
+import com.google.protobuf.ByteString;
 import demo.trc20.Trc20Demo;
 
 public class App {
@@ -162,7 +169,7 @@ public class App {
         System.out.println("============= freeze balance =============");
         TronClient client = TronClient.ofNile("9fd7fb6311aa3251fca212ddf18a3e46a9956230939052e4df59b56f9de45dd5");
         try {
-            TransactionExtention transaction = client.freezeBalance("TLtrDb1udekjDumnrf3EVeke3Q6pHkZxjm", 1_000_000L, 3L,1);
+            TransactionExtention transaction = client.freezeBalance("TLtrDb1udekjDumnrf3EVeke3Q6pHkZxjm", 1_000_000L, 3L,1,"TMmbeRPnFhXC7BPLaF2M1HCsoE4jwZNB7b");
             Transaction signedTxn = client.signTransaction(transaction);
             System.out.println(signedTxn.toString());
             TransactionReturn ret = client.broadcastTransaction(signedTxn);
@@ -176,7 +183,7 @@ public class App {
         System.out.println("============= unFreeze balance =============");
         TronClient client = TronClient.ofNile("9fd7fb6311aa3251fca212ddf18a3e46a9956230939052e4df59b56f9de45dd5");
         try {
-            TransactionExtention transaction = client.unfreezeBalance("TLtrDb1udekjDumnrf3EVeke3Q6pHkZxjm", 1);
+            TransactionExtention transaction = client.unfreezeBalance("TLtrDb1udekjDumnrf3EVeke3Q6pHkZxjm", 1, "TMmbeRPnFhXC7BPLaF2M1HCsoE4jwZNB7b");
             Transaction signedTxn = client.signTransaction(transaction);
             System.out.println(signedTxn.toString());
             TransactionReturn ret = client.broadcastTransaction(signedTxn);
@@ -428,9 +435,10 @@ public class App {
 
     public void getDelegatedResource(){
         System.out.println("============= getDelegatedResource =============");
-        TronClient client = TronClient.ofShasta("3333333333333333333333333333333333333333333333333333333333333333");
+        TronClient client = TronClient.ofNile("3333333333333333333333333333333333333333333333333333333333333333");
         try {
-            System.out.println(client.getDelegatedResource("TRY8j9zftGDt1YMSK8bKaFrtxNY6fk88Hh","THMi9L2TARU6hF4dHa3ugKU74sKvPVncDg"));
+
+            System.out.println(client.getDelegatedResource("TLtrDb1udekjDumnrf3EVeke3Q6pHkZxjm","TMmbeRPnFhXC7BPLaF2M1HCsoE4jwZNB7b"));
         } catch (Exception e) {
             System.out.println("error: " + e);
         }
@@ -438,9 +446,25 @@ public class App {
 
     public void getDelegatedResourceAccountIndex(){
         System.out.println("============= getDelegatedResourceAccountIndex =============");
-        TronClient client = TronClient.ofShasta("3333333333333333333333333333333333333333333333333333333333333333");
+        TronClient client = TronClient.ofNile("3333333333333333333333333333333333333333333333333333333333333333");
         try {
-            System.out.println(client.getDelegatedResourceAccountIndex("TCU1DAnVF9kTzrB8YYZqybxvDvq7q1eVgn"));
+            DelegatedResourceAccountIndex accountIndex = client.getDelegatedResourceAccountIndex("TLtrDb1udekjDumnrf3EVeke3Q6pHkZxjm");
+            ByteString account = accountIndex.getAccount();
+
+            System.out.println("Accounts: "+Base58Check.bytesToBase58(client.parseAddress(client.toHex(account)).toByteArray()));
+
+            int fromAccountsCount = accountIndex.getFromAccountsCount();
+            for(int i =0;i<fromAccountsCount;i++){
+                ByteString fromAccounts = accountIndex.getFromAccounts(i);
+                System.out.println("fromAccounts: "+Base58Check.bytesToBase58(client.parseAddress(client.toHex(fromAccounts)).toByteArray()));
+            }
+
+            int toAccountsCount = accountIndex.getToAccountsCount();
+            for(int i =0;i<toAccountsCount;i++){
+                ByteString toAccounts = accountIndex.getToAccounts(i);
+                System.out.println("toAccounts: "+Base58Check.bytesToBase58(client.parseAddress(client.toHex(toAccounts)).toByteArray()));
+            }
+
         } catch (Exception e) {
             System.out.println("error: " + e);
         }
@@ -663,14 +687,14 @@ public class App {
 
     public static void main(String[] args) {
         App app = new App();
-        Trc20Demo trc20Demo = new Trc20Demo();
+//        Trc20Demo trc20Demo = new Trc20Demo();
 
         // System.out.println(app.encodeFunctionCalling());
 
         // app.getAccountResource();
         // app.getAccountNet();
-        // app.getDelegatedResource();
-        // app.getDelegatedResourceAccountIndex();
+         app.getDelegatedResource();
+//         app.getDelegatedResourceAccountIndex();
         // app.getChainParameters();
         // app.getAssetIssueList();
         // app.getPaginatedAssetIssueList();
@@ -691,8 +715,8 @@ public class App {
         // app.sendTrx();
         // app.transferTrc10();
         // app.sendTrc20();
-        // app.freezeBalance();
-        // app.unFreezeBalance();
+//         app.freezeBalance();
+//         app.unFreezeBalance();
         // app.getBlockByNum();
         // app.getNowBlock();
         // app.getNodeInfo();

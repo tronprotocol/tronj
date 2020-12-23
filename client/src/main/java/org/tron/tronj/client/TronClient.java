@@ -171,6 +171,7 @@ public class TronClient {
         return ByteString.copyFrom(raw);
     }
 
+
     public static ByteString parseHex(String hexString) {
         byte[] raw = Hex.decode(hexString);
         return ByteString.copyFrom(raw);

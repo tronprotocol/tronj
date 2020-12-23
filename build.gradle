@@ -56,9 +56,9 @@ subprojects {
         archives sourcesJar
     }
 
-    signing {
+    /*signing {
         useGpgCmd()
         sign configurations.archives
-    }
+    }*/
 }
 
