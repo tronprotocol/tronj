@@ -63,7 +63,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
 import java.nio.ByteBuffer;
-import java.util.HashMap;
+import java.util.*;
 
 import org.tron.tronj.crypto.tuweniTypes.Bytes32;
 import org.bouncycastle.jcajce.provider.digest.Keccak;
@@ -79,12 +79,9 @@ import org.tron.tronj.proto.Response.ChainParameters;
 import org.tron.tronj.proto.Response.AssetIssueList;
 import org.tron.tronj.proto.Response.ProposalList;
 import org.tron.tronj.proto.Response.ExchangeList;
+import org.tron.tronj.utils.Numeric;
 
 import static org.tron.tronj.proto.Response.TransactionReturn.response_code.SUCCESS;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 public class TronClient {
     public final WalletGrpc.WalletBlockingStub blockingStub;
@@ -334,13 +331,29 @@ public class TronClient {
      */
     public TransactionExtention freezeBalance(String ownerAddress, long frozenBalance, long frozenDuration, int resourceCode) throws IllegalException {
 
+        return freezeBalance(ownerAddress,frozenBalance,frozenDuration,resourceCode,"");
+    }
+
+    /**
+     * Freeze balance to get energy or bandwidth, for 3 days
+     * @param ownerAddress owner address
+     * @param frozenBalance frozen balance
+     * @param frozenDuration frozen duration
+     * @param resourceCode Resource type, can be 0("BANDWIDTH") or 1("ENERGY")
+     * @param receiveAddress the address that will receive the resource, default hexString
+     * @return TransactionExtention
+     * @throws IllegalException if fail to freeze balance
+     */
+    public TransactionExtention freezeBalance(String ownerAddress, long frozenBalance, long frozenDuration, int resourceCode, String receiveAddress) throws IllegalException {
         ByteString rawFrom = parseAddress(ownerAddress);
+        ByteString rawReceiveFrom = parseAddress(receiveAddress);
         FreezeBalanceContract freezeBalanceContract=
                 FreezeBalanceContract.newBuilder()
                         .setOwnerAddress(rawFrom)
                         .setFrozenBalance(frozenBalance)
                         .setFrozenDuration(frozenDuration)
                         .setResourceValue(resourceCode)
+                        .setReceiverAddress(rawReceiveFrom)
                         .build();
         TransactionExtention txnExt = blockingStub.freezeBalance2(freezeBalanceContract);
 
@@ -360,10 +373,24 @@ public class TronClient {
      */
     public TransactionExtention unfreezeBalance(String ownerAddress, int resourceCode) throws IllegalException {
 
+        return unfreezeBalance(ownerAddress,resourceCode,"");
+    }
+
+    /**
+     * Unfreeze balance to get TRX back
+     * @param ownerAddress owner address
+     * @param resourceCode Resource type, can be 0("BANDWIDTH") or 1("ENERGY")
+     * @param receiveAddress the address that will lose the resource, default hexString
+     * @return TransactionExtention
+     * @throws IllegalException if fail to unfreeze balance
+     */
+    public TransactionExtention unfreezeBalance(String ownerAddress, int resourceCode, String receiveAddress) throws IllegalException {
+
         UnfreezeBalanceContract unfreeze =
                 UnfreezeBalanceContract.newBuilder()
                         .setOwnerAddress(parseAddress(ownerAddress))
                         .setResourceValue(resourceCode)
+                        .setReceiverAddress(parseAddress(receiveAddress))
                         .build();
 
         TransactionExtention txnExt = blockingStub.unfreezeBalance2(unfreeze);
@@ -677,6 +704,7 @@ public class TronClient {
                 .build();
 
         DelegatedResourceAccountIndex accountIndex = blockingStub.getDelegatedResourceAccountIndex(bytesMessage);
+
         return accountIndex;
     }
 
