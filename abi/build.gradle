@@ -30,7 +30,7 @@ bintray {
     pkg {
         repo = 'tronj'
         name = 'abi'
-        userOrg = 'tronj'
+        // userOrg = 'tronj'
         // configurations = ['archives']
         desc = description
         websiteUrl = 'https://github.com/tronprotocol/tronj'

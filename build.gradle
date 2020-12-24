@@ -10,7 +10,7 @@ ext {
 }
 
 allprojects {
-    version '0.1.0'
+    version '0.1.1'
     group = 'org.tron.tronj'
 
     repositories {
@@ -56,9 +56,9 @@ subprojects {
         archives sourcesJar
     }
 
-    /*signing {
-        useGpgCmd()
-        sign configurations.archives
-    }*/
+    // signing {
+    //     useGpgCmd()
+    //     sign configurations.archives
+    // }
 }
 
