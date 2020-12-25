@@ -455,7 +455,8 @@ public class TronClient {
     //only if account.getAccountName() == null can update name
     public TransactionExtention updateAccount(String address, String accountName) throws IllegalException {
         ByteString bsAddress = parseAddress(address);
-        ByteString bsAccountName = parseAddress(accountName);
+        byte[] bytesAccountName = accountName.getBytes();
+        ByteString bsAccountName = ByteString.copyFrom(bytesAccountName);
 
         AccountUpdateContract contract = createAccountUpdateContract(bsAccountName,
                 bsAddress);
@@ -529,6 +530,9 @@ public class TronClient {
                 .build();
         BlockListExtention blockListExtention = blockingStub.getBlockByLimitNext2(blockLimit);
 
+        if(endNum - startNum > 100){
+            throw new IllegalException("The difference between startNum and endNum cannot be greater than 100, please check it.");
+        }
         if(blockListExtention.getBlockCount() == 0){
             throw new IllegalException();
         }
@@ -921,6 +925,7 @@ public class TronClient {
     public static AccountUpdateContract createAccountUpdateContract(ByteString accountName,
                                                                     ByteString address) {
         AccountUpdateContract.Builder builder = AccountUpdateContract.newBuilder();
+
 
         builder.setAccountName(accountName);
         builder.setOwnerAddress(address);
