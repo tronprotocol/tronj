@@ -1,4 +1,4 @@
-package org.tron.tronj.client.Transaction;
+package org.tron.tronj.client.transaction;
 
 /**
  * The {@code TransactionBuilder} class provides mutator methods

@@ -1,4 +1,4 @@
-package org.tron.tronj.client;
+package org.tron.tronj.client.exceptions;
 
 public class IllegalException extends  Exception {
     public IllegalException(){
