@@ -80,6 +80,14 @@ public class Contract {
         abiToFunctions();
     }
 
+    public TronClient getClient() {
+        return client;
+    }
+
+    public void setClient(TronClient client) {
+        this.client = client;
+    }
+
     public ByteString getOriginAddr() {
         return originAddr;
     }
@@ -102,6 +110,10 @@ public class Contract {
 
     public void setAbi(ABI abi) {
         this.abi = abi;
+    }
+
+    public void setAbi(String abiString) {
+        this.abi = loadAbiFromJson(abiString);
     }
 
     public ByteString getBytecode() {
@@ -177,6 +189,7 @@ public class Contract {
     }
 
     public static class Builder {
+        protected TronClient client;
         protected ByteString originAddr = ByteString.EMPTY;
         protected ByteString cntrAddr = ByteString.EMPTY;
         protected ABI abi;
@@ -188,6 +201,11 @@ public class Contract {
         protected ByteString codeHash = ByteString.EMPTY;
         protected ByteString trxHash = ByteString.EMPTY;
         protected ByteString ownerAddr = ByteString.EMPTY;
+
+        public Builder setClient(TronClient client) {
+            this.client = client;
+            return this;
+        }
 
         public Builder setOriginAddr(ByteString originAddr) {
             this.originAddr = originAddr;
@@ -322,7 +340,7 @@ public class Contract {
    */
     public CreateSmartContract deploy(long callTokenValue, long tokenId) {
         //throws if deployed
-        if (this.cntrAddr.isEmpty()) {
+        if (!this.cntrAddr.isEmpty()) {
             throw new RuntimeException("This contract has already been deployed.");
         }
         //throws if origin address does not match owner address
@@ -342,5 +360,21 @@ public class Contract {
         return builder.build();
     }
 
+    /**
+     * load abi from json format string
+     * @param abiString abi string in json format
+     * @return proto.Common.SmartContract.ABI
+     * @throws JsonProcessingException
+     */
+    public ABI loadAbiFromJson(String abiString) {
+        ObjectMapper mapper = new ObjectMapper();
+        ABI abi;
+        try {
+            abi = mapper.readValue(abiString, ABI.class);
+        } catch (JsonProcessingException e) {
+            throw(e);
+        }
+        return abi;
+    }
     
 }
