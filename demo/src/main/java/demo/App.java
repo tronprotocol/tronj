@@ -33,7 +33,7 @@ import org.tron.tronj.proto.Chain.BlockHeader;
 import org.tron.tronj.proto.Response.DelegatedResourceAccountIndex;
 import org.tron.tronj.utils.Base58Check;
 import com.google.protobuf.ByteString;
-import demo.trc20.Trc20Demo;
+import demo.smartContract.trc20.Trc20Demo;
 
 public class App {
     public String encodeFunctionCalling() {
