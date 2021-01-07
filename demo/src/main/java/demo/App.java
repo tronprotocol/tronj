@@ -11,7 +11,6 @@ import org.tron.tronj.abi.datatypes.generated.Uint256;
 import org.tron.tronj.abi.datatypes.generated.Uint32;
 import org.tron.tronj.abi.datatypes.*;
 import org.tron.tronj.client.contract.Contract;
-import org.tron.tronj.client.contract.ContractFunction;
 import org.tron.tronj.client.transaction.TransactionBuilder;
 import org.tron.tronj.client.TronClient;
 import org.tron.tronj.proto.Chain.Transaction;
@@ -33,7 +32,9 @@ import org.tron.tronj.proto.Chain.BlockHeader;
 import org.tron.tronj.proto.Response.DelegatedResourceAccountIndex;
 import org.tron.tronj.utils.Base58Check;
 import com.google.protobuf.ByteString;
+//demo classes
 import demo.smartContract.trc20.Trc20Demo;
+import demo.smartContract.SmartContractDemo;
 
 public class App {
     public String encodeFunctionCalling() {
@@ -312,22 +313,6 @@ public class App {
             System.out.println("error: " + e);
         }
     }*/
-
-    public void getSmartContract() {
-        TronClient client = TronClient.ofNile("3333333333333333333333333333333333333333333333333333333333333333");
-        try {
-
-            Contract cntr = client.getContract("THi2qJf6XmvTJSpZHc17HgQsmJop6kb3ia");
-            System.out.println("Contract name: " + cntr.getName());
-            // System.out.println("Contract ABI: " + cntr.getAbi());
-            System.out.println("Contract functions: " + cntr.getFunctions().size());
-            for (ContractFunction cf : cntr.getFunctions()) {
-                System.out.println(cf.toString());
-            }
-        } catch (Exception e) {
-            System.out.println("error: " + e);
-        }
-    }
 
     public void getTransactionInfoById() {
         System.out.println("============= getTransactionInfoById =============");
@@ -687,13 +672,14 @@ public class App {
 
     public static void main(String[] args) {
         App app = new App();
-//        Trc20Demo trc20Demo = new Trc20Demo();
+        // Trc20Demo trc20Demo = new Trc20Demo();
+        SmartContractDemo smartContractDemo = new SmartContractDemo();
 
         // System.out.println(app.encodeFunctionCalling());
 
         // app.getAccountResource();
         // app.getAccountNet();
-         app.getDelegatedResource();
+        //  app.getDelegatedResource();
 //         app.getDelegatedResourceAccountIndex();
         // app.getChainParameters();
         // app.getAssetIssueList();
@@ -727,7 +713,8 @@ public class App {
         // app.getAccount();
         // app.voteWitness();
         // app.transferTrc20();
-        // app.getSmartContract();
+        
+        // smartContractDemo.getSmartContract();
         // app.viewContractName();
         // app.triggerCallDemo();
         // app.getAccountSolidity();
@@ -745,5 +732,6 @@ public class App {
         // trc20Demo.transferFrom();
         // trc20Demo.approve();
         // trc20Demo.getAllowance();
+        // smartContractDemo.deploySmartContract();
     }
 }
