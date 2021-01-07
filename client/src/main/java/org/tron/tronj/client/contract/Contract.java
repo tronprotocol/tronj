@@ -16,6 +16,9 @@ package org.tron.tronj.client.contract;
  */
 
 import com.google.protobuf.ByteString;
+import com.google.protobuf.util.JsonFormat;
+
+import org.tron.tronj.client.transaction.TransactionBuilder;
 import org.tron.tronj.client.TronClient;
 import org.tron.tronj.proto.Chain.Transaction;
 import org.tron.tronj.proto.Common.SmartContract;
@@ -33,9 +36,11 @@ public class Contract {
     protected ByteString cntrAddr = ByteString.EMPTY;
     protected ABI abi;
     protected ByteString bytecode;
+    //the amount of deposit TRX, default is 0
     protected long callValue = 0;
+    //the energy percent user consumes, default is 100%
     protected long consumeUserResourcePercent = 100;
-    protected String name;
+    protected String name = "";
     protected long originEnergyLimit = 1;
     protected ByteString codeHash = ByteString.EMPTY;
     protected ByteString trxHash = ByteString.EMPTY;
@@ -112,8 +117,10 @@ public class Contract {
         this.abi = abi;
     }
 
-    public void setAbi(String abiString) {
-        this.abi = loadAbiFromJson(abiString);
+    public void setAbi(String abiString) throws Exception {
+        ABI.Builder builder = ABI.newBuilder();
+        loadAbiFromJson(abiString, builder);
+        this.abi = builder.build();
     }
 
     public ByteString getBytecode() {
@@ -196,7 +203,7 @@ public class Contract {
         protected ByteString bytecode;
         protected long callValue = 0;
         protected long consumeUserResourcePercent = 100;
-        protected String name;
+        protected String name = "";
         protected long originEnergyLimit = 1;
         protected ByteString codeHash = ByteString.EMPTY;
         protected ByteString trxHash = ByteString.EMPTY;
@@ -219,6 +226,13 @@ public class Contract {
 
         public Builder setAbi(ABI abi) {
             this.abi = abi;
+            return this;
+        }
+
+        public Builder setAbi(String abiString) throws Exception {
+            ABI.Builder builder = ABI.newBuilder();
+            loadAbiFromJson(abiString, builder);
+            this.abi = builder.build();
             return this;
         }
 
@@ -327,7 +341,7 @@ public class Contract {
                    .build();
     }
 
-    public CreateSmartContract deploy() {
+    public TransactionBuilder deploy() throws Exception {
         //No deposit when creating contract
         return deploy(0, 0);
     }
@@ -336,9 +350,10 @@ public class Contract {
    * create a CreateSmartContract object to get ready for deployment
    * @param callTokenValue deposit amount while deploying
    * @param tokenId token id
-   * @return CreateSmartContract object for signing and broadcasting
+   * @return TransactionBuilder object for signing and broadcasting
+   * @throws RuntimeException if deployment duplicating / owner and origin address don't match
    */
-    public CreateSmartContract deploy(long callTokenValue, long tokenId) {
+    public TransactionBuilder deploy(long callTokenValue, long tokenId) throws Exception {
         //throws if deployed
         if (!this.cntrAddr.isEmpty()) {
             throw new RuntimeException("This contract has already been deployed.");
@@ -348,33 +363,27 @@ public class Contract {
             throw new RuntimeException("Origin address and owner address mismatch.");
         }
         //create
-        CreateSmartContract.Builder builder = CreateSmartContract.newBuilder();
-        builder.setOwnerAddress(ownerAddr);
-        builder.setNewContract(toProto());
+        CreateSmartContract.Builder createSmartContractBuilder = CreateSmartContract.newBuilder();
+        createSmartContractBuilder.setOwnerAddress(ownerAddr);
+        createSmartContractBuilder.setNewContract(toProto());
         //if any deposit
         if (tokenId != 0) {
-            builder.setTokenId(tokenId);
-            builder.setCallTokenValue(callTokenValue);
+            createSmartContractBuilder.setTokenId(tokenId);
+            createSmartContractBuilder.setCallTokenValue(callTokenValue);
         }
 
-        return builder.build();
+        return new TransactionBuilder(client.blockingStub.deployContract(createSmartContractBuilder.build()).getTransaction());
     }
 
     /**
      * load abi from json format string
      * @param abiString abi string in json format
      * @return proto.Common.SmartContract.ABI
-     * @throws JsonProcessingException
+     * @throws InvalidProtocolBufferException if the input is not valid JSON format or there are unknown fields in the input
      */
-    public ABI loadAbiFromJson(String abiString) {
-        ObjectMapper mapper = new ObjectMapper();
-        ABI abi;
-        try {
-            abi = mapper.readValue(abiString, ABI.class);
-        } catch (JsonProcessingException e) {
-            throw(e);
-        }
-        return abi;
+    public static void loadAbiFromJson(String abiString, ABI.Builder builder) throws Exception {
+        JsonFormat.Parser parser = JsonFormat.parser();
+        parser.merge(abiString, builder);
     }
     
 }

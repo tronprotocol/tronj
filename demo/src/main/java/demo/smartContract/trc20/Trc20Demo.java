@@ -1,4 +1,4 @@
-package demo.trc20;
+package demo.smartContract.trc20;
 
 /**
  * TRC-20 wrapper class functions calling demos.
