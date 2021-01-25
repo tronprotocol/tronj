@@ -5,15 +5,25 @@ package demo.smartContract;
  * smart contract related operations.
  */
 
+import org.tron.tronj.abi.datatypes.Function;
+import org.tron.tronj.abi.datatypes.Utf8String;
+import org.tron.tronj.abi.TypeReference;
+import org.tron.tronj.abi.FunctionEncoder;
+import org.tron.tronj.abi.FunctionReturnDecoder;
 import org.tron.tronj.client.contract.Contract;
 import org.tron.tronj.client.contract.ContractFunction;
 import org.tron.tronj.client.transaction.TransactionBuilder;
 import org.tron.tronj.client.TronClient;
 import org.tron.tronj.proto.Chain.Transaction;
 import org.tron.tronj.proto.Common.SmartContract.ABI;
+import org.tron.tronj.proto.Response.TransactionExtention;
 import org.tron.tronj.proto.Response.TransactionReturn;
+import org.tron.tronj.utils.Base58Check;
 
 import com.google.protobuf.ByteString;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 public class SmartContractDemo {
     private final TronClient client = TronClient.ofNile("7c3a547f37cf82c7bd7cead99e53fd9a7d3bf6a3c8bd3c8541ad572322d16e42");
