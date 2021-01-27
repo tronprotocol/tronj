@@ -11,6 +11,7 @@ import org.tron.tronj.abi.datatypes.generated.Uint256;
 import org.tron.tronj.abi.datatypes.generated.Uint32;
 import org.tron.tronj.abi.datatypes.*;
 import org.tron.tronj.client.contract.Contract;
+import org.tron.tronj.client.contract.ContractFunction;
 import org.tron.tronj.client.transaction.TransactionBuilder;
 import org.tron.tronj.client.TronClient;
 import org.tron.tronj.proto.Chain.Transaction;
@@ -32,9 +33,13 @@ import org.tron.tronj.proto.Chain.BlockHeader;
 import org.tron.tronj.proto.Response.DelegatedResourceAccountIndex;
 import org.tron.tronj.utils.Base58Check;
 import com.google.protobuf.ByteString;
-//demo classes
 import demo.smartContract.trc20.Trc20Demo;
-import demo.smartContract.SmartContractDemo;
+//demo/src/main/java/demo/smartContract/trc20/Trc20Demo.java
+import org.tron.tronj.proto.Response.TransactionSignWeight;
+import org.tron.tronj.proto.Response.TransactionApprovedList;
+import org.tron.tronj.proto.Contract.AccountPermissionUpdateContract;
+import org.tron.tronj.proto.Common.Permission;
+import org.tron.tronj.proto.Common;
 
 public class App {
     public String encodeFunctionCalling() {
@@ -314,6 +319,22 @@ public class App {
         }
     }*/
 
+    public void getSmartContract() {
+        TronClient client = TronClient.ofNile("3333333333333333333333333333333333333333333333333333333333333333");
+        try {
+
+            Contract cntr = client.getContract("THi2qJf6XmvTJSpZHc17HgQsmJop6kb3ia");
+            System.out.println("Contract name: " + cntr.getName());
+            // System.out.println("Contract ABI: " + cntr.getAbi());
+            System.out.println("Contract functions: " + cntr.getFunctions().size());
+            for (ContractFunction cf : cntr.getFunctions()) {
+                System.out.println(cf.toString());
+            }
+        } catch (Exception e) {
+            System.out.println("error: " + e);
+        }
+    }
+
     public void getTransactionInfoById() {
         System.out.println("============= getTransactionInfoById =============");
         TronClient client = TronClient.ofNile("3333333333333333333333333333333333333333333333333333333333333333");
@@ -352,6 +373,7 @@ public class App {
         try {
             Function viewName = new Function("name", Collections.emptyList(), Collections.emptyList());
             TransactionExtention txnExt = client.constantCall("TJRabPrwbZy45sbavfcjinPJC18kjpRTv8", "TF17BgPaZYbz8oxbjhriubPDsA7ArKoLX3", viewName);
+            System.out.println(txnExt);
         } catch (Exception e) {
             System.out.println("error: " + e);
         }
@@ -360,9 +382,20 @@ public class App {
 
     public void getAccount(){
         System.out.println("============= getAccount =============");
-        TronClient client = TronClient.ofShasta("3333333333333333333333333333333333333333333333333333333333333333");
+        TronClient client = TronClient.ofNile("5bffa78c05e58d25e6d9fca69ece106678b5acdb558fd329972f0e860f27974f");
         try {
-            System.out.println(client.getAccount("TCta4rhDcnHvEQTX8NrM1WTowR41msiAwj").getAccountName());
+//            System.out.println(Base58Check.bytesToBase58(client.parseAddress(client.toHex("A\"\355b\226~\320\322\030k/\3069\327\227-\027*\225\310U")).toByteArray()));
+            System.out.println(client.getAccount("4122ED62967ED0D2186B2FC639D7972D172A95C855"));
+        } catch (Exception e) {
+            System.out.println("error: " + e);
+        }
+    }
+
+    public void getAccountById(){
+        System.out.println("============= getAccountById =============");
+        TronClient client = TronClient.ofNile("3333333333333333333333333333333333333333333333333333333333333333");
+        try {
+            System.out.println(client.getAccountById("1"));
         } catch (Exception e) {
             System.out.println("error: " + e);
         }
@@ -370,9 +403,9 @@ public class App {
 
     public void updateAccount(){
         System.out.println("============= updateAccount =============");
-        TronClient client = TronClient.ofNile("2ed817d9e8ee88a04b4ec4f348382f7149a09a305d03c9170233f5d180f46e6a");
+        TronClient client = TronClient.ofNile("5bffa78c05e58d25e6d9fca69ece106678b5acdb558fd329972f0e860f27974f");
         try {
-            TransactionExtention transaction = client.updateAccount("TMmbeRPnFhXC7BPLaF2M1HCsoE4jwZNB7b","");
+            TransactionExtention transaction = client.updateAccount("TD9tMPSfBJ3To8s71vdBz2BLT2wwBNWyLc","23");
             System.out.println(transaction);
             Transaction signedTxn = client.signTransaction(transaction);
             System.out.println(signedTxn.toString());
@@ -387,7 +420,7 @@ public class App {
         System.out.println("============= createAccount =============");
         TronClient client = TronClient.ofNile("2ed817d9e8ee88a04b4ec4f348382f7149a09a305d03c9170233f5d180f46e6a");
         try {
-            TransactionExtention transaction = client.createAccount("TMmbeRPnFhXC7BPLaF2M1HCsoE4jwZNB7b","TH9ADEXR4wjHtnrdv7Ea1RchmCn5b5GQ6v");
+            TransactionExtention transaction = client.createAccount("TMmbeRPnFhXC7BPLaF2M1HCsoE4jwZNB7b","TD9tMPSfBJ3To8s71vdBz2BLT2wwBNWyLc");
             System.out.println(transaction);
             Transaction signedTxn = client.signTransaction(transaction);
             System.out.println(signedTxn.toString());
@@ -413,6 +446,16 @@ public class App {
         TronClient client = TronClient.ofShasta("3333333333333333333333333333333333333333333333333333333333333333");
         try {
             System.out.println(client.getAccountNet("TKwVM5tsELuTE3a5SUCWiQyVtEgxejL5Wj"));
+        } catch (Exception e) {
+            System.out.println("error: " + e);
+        }
+    }
+
+    public void getAccountBalance(){
+        System.out.println("============= getAccountBalance =============");
+        TronClient client = TronClient.ofNile("3333333333333333333333333333333333333333333333333333333333333333");
+        try {
+            System.out.println(client.getAccountBalance("TMmbeRPnFhXC7BPLaF2M1HCsoE4jwZNB7b"));
         } catch (Exception e) {
             System.out.println("error: " + e);
         }
@@ -620,9 +663,9 @@ public class App {
 
     public void getAssetIssueByAccount() {
         System.out.println("============= getAssetIssueByAccount =============");
-        TronClient client = TronClient.ofNile("3333333333333333333333333333333333333333333333333333333333333333");
+        TronClient client = TronClient.ofNile("5bffa78c05e58d25e6d9fca69ece106678b5acdb558fd329972f0e860f27974f");
         try {
-            System.out.println(client.getAssetIssueByAccount("TMX73eFtUtyZXg62uCnjSywDu7pD5sau48"));
+            System.out.println(client.getAssetIssueByAccount("TD9tMPSfBJ3To8s71vdBz2BLT2wwBNWyLc"));
         } catch (Exception e) {
             System.out.println("error: " + e);
         }
@@ -630,9 +673,29 @@ public class App {
 
     public void getAssetIssueById() {
         System.out.println("============= getAssetIssueById =============");
-        TronClient client = TronClient.ofNile("3333333333333333333333333333333333333333333333333333333333333333");
+        TronClient client = TronClient.ofNile("9fd7fb6311aa3251fca212ddf18a3e46a9956230939052e4df59b56f9de45dd5");
         try {
-            System.out.println(client.getAssetIssueById("1000134"));
+            System.out.println(client.getAssetIssueById("1000200"));
+        } catch (Exception e) {
+            System.out.println("error: " + e);
+        }
+    }
+
+    public void getAssetIssueByName() {
+        System.out.println("============= getAssetIssueByName =============");
+        TronClient client = TronClient.ofNile("9fd7fb6311aa3251fca212ddf18a3e46a9956230939052e4df59b56f9de45dd5");
+        try {
+            System.out.println(client.getAssetIssueByName("lsp"));
+        } catch (Exception e) {
+            System.out.println("error: " + e);
+        }
+    }
+
+    public void getAssetIssueListByName() {
+        System.out.println("============= getAssetIssueListByName =============");
+        TronClient client = TronClient.ofNile("9fd7fb6311aa3251fca212ddf18a3e46a9956230939052e4df59b56f9de45dd5");
+        try {
+            System.out.println(client.getAssetIssueByName("lsp"));
         } catch (Exception e) {
             System.out.println("error: " + e);
         }
@@ -669,32 +732,193 @@ public class App {
         }
     }
 
+    public void setAccountId() {
+        System.out.println("============= setAccountId =============");
+        TronClient client = TronClient.ofNile("9fd7fb6311aa3251fca212ddf18a3e46a9956230939052e4df59b56f9de45dd5");
+        try {
+            Transaction transaction = client.setAccountId("5","TLtrDb1udekjDumnrf3EVeke3Q6pHkZxjm");
+            System.out.println(transaction);
+            Transaction signedTxn = client.signTransaction(transaction);
+            System.out.println(signedTxn.toString());
+            TransactionReturn ret = client.broadcastTransaction(signedTxn);
+            System.out.println("======== Result ========\n" + ret.toString());
+        } catch (Exception e) {
+            System.out.println("error: " + e);
+        }
+    }
+
+    public void createAssetIssue() {
+        System.out.println("============= createAssetIssue =============");
+        TronClient client = TronClient.ofNile("5bffa78c05e58d25e6d9fca69ece106678b5acdb558fd329972f0e860f27974f");
+        try {
+            long start = System.currentTimeMillis() + 2000;
+            long end = System.currentTimeMillis() + 1000000000;
+
+            TransactionExtention transaction = client.createAssetIssue("TD9tMPSfBJ3To8s71vdBz2BLT2wwBNWyLc","lsp1", "saf1",100000000L, 1, 1000,start,end,"7777772e6578616d706c652e636f6d",
+                    100000L,1L,6,1L,1L,"stest-assetissue");
+            System.out.println(transaction);
+            Transaction signedTxn = client.signTransaction(transaction);
+            System.out.println(signedTxn.toString());
+            TransactionReturn ret = client.broadcastTransaction(signedTxn);
+            System.out.println("======== Result ========\n" + ret.toString());
+        } catch (Exception e) {
+            System.out.println("error: " + e);
+        }
+    }
+
+    public void participateAssetIssue() {
+        System.out.println("============= participateAssetIssue =============");
+        TronClient client = TronClient.ofNile("9fd7fb6311aa3251fca212ddf18a3e46a9956230939052e4df59b56f9de45dd5");
+        try {
+
+            TransactionExtention transaction = client.participateAssetIssue("TD9tMPSfBJ3To8s71vdBz2BLT2wwBNWyLc","TLtrDb1udekjDumnrf3EVeke3Q6pHkZxjm","1000204", 1L);
+            System.out.println(transaction);
+            Transaction signedTxn = client.signTransaction(transaction);
+            System.out.println(signedTxn.toString());
+            TransactionReturn ret = client.broadcastTransaction(signedTxn);
+            System.out.println("======== Result ========\n" + ret.toString());
+        } catch (Exception e) {
+            System.out.println("error: " + e);
+        }
+    }
+
+    public void updateAsset() {
+        System.out.println("============= updateAsset =============");
+        TronClient client = TronClient.ofNile("5bffa78c05e58d25e6d9fca69ece106678b5acdb558fd329972f0e860f27974f");
+        try {
+
+            TransactionExtention transaction = client.updateAsset("TD9tMPSfBJ3To8s71vdBz2BLT2wwBNWyLc","newlsp","sadf", 1,2);
+            System.out.println(transaction);
+            Transaction signedTxn = client.signTransaction(transaction);
+            System.out.println(signedTxn.toString());
+            TransactionReturn ret = client.broadcastTransaction(signedTxn);
+            System.out.println("======== Result ========\n" + ret.toString());
+        } catch (Exception e) {
+            System.out.println("error: " + e);
+        }
+    }
+
+    public void unfreezeAsset() {
+        System.out.println("============= unfreezeAsset =============");
+        TronClient client = TronClient.ofNile("5bffa78c05e58d25e6d9fca69ece106678b5acdb558fd329972f0e860f27974f");
+        try {
+
+            TransactionExtention transaction = client.unfreezeAsset("TD9tMPSfBJ3To8s71vdBz2BLT2wwBNWyLc");
+            System.out.println(transaction);
+            Transaction signedTxn = client.signTransaction(transaction);
+            System.out.println(signedTxn.toString());
+            TransactionReturn ret = client.broadcastTransaction(signedTxn);
+            System.out.println("======== Result ========\n" + ret.toString());
+        } catch (Exception e) {
+            System.out.println("error: " + e);
+        }
+    }
+
+    public void getTransactionSignWeight() {
+        System.out.println("============= getTransactionSignWeight =============");
+        TronClient client = TronClient.ofNile("3333333333333333333333333333333333333333333333333333333333333333");
+        try {
+
+            TransactionSignWeight transaction = client.getTransactionSignWeight(client.getTransactionById("786c7516df88941e33ea44f03e637bd8c1ddcfd058634574102c6e3cfb93de0d"));
+            System.out.println(transaction);
+        } catch (Exception e) {
+            System.out.println("error: " + e);
+        }
+    }
+
+    public void getTransactionApprovedList() {
+        System.out.println("============= getTransactionApprovedList =============");
+        TronClient client = TronClient.ofNile("3333333333333333333333333333333333333333333333333333333333333333");
+        try {
+
+            TransactionApprovedList transaction = client.getTransactionApprovedList(client.getTransactionById("786c7516df88941e33ea44f03e637bd8c1ddcfd058634574102c6e3cfb93de0d"));
+            System.out.println(transaction);
+        } catch (Exception e) {
+            System.out.println("error: " + e);
+        }
+    }
+
+    public void accountPermissionUpdate(){
+        System.out.println("============= accountPermissionUpdate =============");
+        TronClient client = TronClient.ofNile("5bffa78c05e58d25e6d9fca69ece106678b5acdb558fd329972f0e860f27974f");
+        try {
+
+        AccountPermissionUpdateContract.Builder builder =
+                AccountPermissionUpdateContract.newBuilder();
+
+        Permission ownerPermission = null;
+        Permission.Builder builderOwner =
+                Permission.newBuilder();
+        builderOwner.setTypeValue(0);
+        builderOwner.setPermissionName("owner");
+        builderOwner.setThreshold(1);
+        Common.Key.Builder keyOwner =
+                Common.Key.newBuilder();
+        keyOwner.setAddress(client.parseAddress("4122ED62967ED0D2186B2FC639D7972D172A95C855"));
+        keyOwner.setWeight(1);
+        builderOwner.addKeys(keyOwner);
+        ownerPermission = builderOwner.build();
+
+        Permission activePermissions = null;
+        Permission.Builder builderActive =
+                Permission.newBuilder();
+        builderActive.setTypeValue(2);
+        builderActive.setThreshold(1);
+        builderActive.setPermissionName("active0");
+
+        builderActive.setOperations(client.parseAddress("7fff1fc0037e0000000000000000000000000000000000000000000000000000"));
+        Common.Key.Builder keyActive =
+                Common.Key.newBuilder();
+        keyActive.setAddress(client.parseAddress("4122ED62967ED0D2186B2FC639D7972D172A95C855"));
+        keyActive.setWeight(1);
+        builderActive.addKeys(keyActive);
+        activePermissions = builderActive.build();
+
+        builder.setOwner(ownerPermission);
+        builder.addActives(activePermissions);
+        builder.setOwnerAddress(client.parseAddress("4122ED62967ED0D2186B2FC639D7972D172A95C855"));
+
+        TransactionExtention transaction = client.accountPermissionUpdate(builder.build());
+        System.out.println(transaction);
+        Transaction signedTxn = client.signTransaction(transaction);
+        System.out.println(signedTxn.toString());
+        TransactionReturn ret = client.broadcastTransaction(signedTxn);
+        System.out.println("======== Result ========\n" + ret.toString());
+        } catch (Exception e) {
+            System.out.println("error: " + e);
+        }
+    }
+
 
     public static void main(String[] args) {
         App app = new App();
-        // Trc20Demo trc20Demo = new Trc20Demo();
-        SmartContractDemo smartContractDemo = new SmartContractDemo();
+//        Trc20Demo trc20Demo = new Trc20Demo();
 
         // System.out.println(app.encodeFunctionCalling());
 
         // app.getAccountResource();
         // app.getAccountNet();
-        //  app.getDelegatedResource();
+//         app.getDelegatedResource();
 //         app.getDelegatedResourceAccountIndex();
         // app.getChainParameters();
         // app.getAssetIssueList();
         // app.getPaginatedAssetIssueList();
-        // app.getAssetIssueByAccount();
-        // app.getAssetIssueById();
+//         app.getAssetIssueByAccount();
+//         app.getAssetIssueById();
+//            app.getAssetIssueByName();
+//            app.getAssetIssueListByName();
         // app.listProposals();
         // app.listWitnesses();
         // app.listExchanges();
         // app.getExchangeById();
         // app.getProposalById();
-        // app.getAccount();
+//         app.getAccount();
+//        app.getAccountBalance();
         // app.voteWitness();
-        // app.updateAccount();
-        // app.createAccount();
+//         app.updateAccount();
+//         app.createAccount();
+//        app.setAccountId();
+//        app.getAccountById();
         // app.decodeFunctionReturn();
         // app.signTransaction();
         // app.trc20Encode();
@@ -713,16 +937,21 @@ public class App {
         // app.getAccount();
         // app.voteWitness();
         // app.transferTrc20();
-        
-        // smartContractDemo.getSmartContract();
-        // app.viewContractName();
+        // app.getSmartContract();
+//         app.viewContractName();
         // app.triggerCallDemo();
         // app.getAccountSolidity();
         // app.getTransactionByIdSolidity();
         // app.generateAddress();
         // app.getNowBlockSolidity();
         // app.getRewardSolidity();
-
+//            app.createAssetIssue();
+//            app.participateAssetIssue();
+//            app.updateAsset();
+//            app.unfreezeAsset();
+//            app.getTransactionSignWeight();
+//            app.getTransactionApprovedList();
+        app.accountPermissionUpdate();
         // trc20Demo.getName();
         // trc20Demo.getSymbol();
         // trc20Demo.getDecimals();
@@ -732,6 +961,5 @@ public class App {
         // trc20Demo.transferFrom();
         // trc20Demo.approve();
         // trc20Demo.getAllowance();
-        // smartContractDemo.deploySmartContract();
     }
 }
