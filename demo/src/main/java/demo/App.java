@@ -32,8 +32,10 @@ import org.tron.tronj.proto.Chain.BlockHeader;
 
 import org.tron.tronj.proto.Response.DelegatedResourceAccountIndex;
 import org.tron.tronj.utils.Base58Check;
+import org.tron.tronj.crypto.SECP256K1;
 import com.google.protobuf.ByteString;
 import demo.smartContract.trc20.Trc20Demo;
+import demo.smartContract.SmartContractDemo;
 //demo/src/main/java/demo/smartContract/trc20/Trc20Demo.java
 import org.tron.tronj.proto.Response.TransactionSignWeight;
 import org.tron.tronj.proto.Response.TransactionApprovedList;
@@ -892,41 +894,42 @@ public class App {
 
     public static void main(String[] args) {
         App app = new App();
-//        Trc20Demo trc20Demo = new Trc20Demo();
+        // Trc20Demo trc20Demo = new Trc20Demo();
+        SmartContractDemo scDemo = new SmartContractDemo();
 
         // System.out.println(app.encodeFunctionCalling());
 
         // app.getAccountResource();
         // app.getAccountNet();
-//         app.getDelegatedResource();
-//         app.getDelegatedResourceAccountIndex();
+        // app.getDelegatedResource();
+        // app.getDelegatedResourceAccountIndex();
         // app.getChainParameters();
         // app.getAssetIssueList();
         // app.getPaginatedAssetIssueList();
-//         app.getAssetIssueByAccount();
-//         app.getAssetIssueById();
-//            app.getAssetIssueByName();
-//            app.getAssetIssueListByName();
+        // app.getAssetIssueByAccount();
+        // app.getAssetIssueById();
+        // app.getAssetIssueByName();
+        // app.getAssetIssueListByName();
         // app.listProposals();
         // app.listWitnesses();
         // app.listExchanges();
         // app.getExchangeById();
         // app.getProposalById();
-//         app.getAccount();
-//        app.getAccountBalance();
+        // app.getAccount();
+        // app.getAccountBalance();
         // app.voteWitness();
-//         app.updateAccount();
-//         app.createAccount();
-//        app.setAccountId();
-//        app.getAccountById();
+        // app.updateAccount();
+        // app.createAccount();
+        // app.setAccountId();
+        // app.getAccountById();
         // app.decodeFunctionReturn();
         // app.signTransaction();
         // app.trc20Encode();
         // app.sendTrx();
         // app.transferTrc10();
         // app.sendTrc20();
-//         app.freezeBalance();
-//         app.unFreezeBalance();
+        // app.freezeBalance();
+        // app.unFreezeBalance();
         // app.getBlockByNum();
         // app.getNowBlock();
         // app.getNodeInfo();
@@ -938,20 +941,20 @@ public class App {
         // app.voteWitness();
         // app.transferTrc20();
         // app.getSmartContract();
-//         app.viewContractName();
+        // app.viewContractName();
         // app.triggerCallDemo();
         // app.getAccountSolidity();
         // app.getTransactionByIdSolidity();
         // app.generateAddress();
         // app.getNowBlockSolidity();
         // app.getRewardSolidity();
-//            app.createAssetIssue();
-//            app.participateAssetIssue();
-//            app.updateAsset();
-//            app.unfreezeAsset();
-//            app.getTransactionSignWeight();
-//            app.getTransactionApprovedList();
-        app.accountPermissionUpdate();
+        // app.createAssetIssue();
+        // app.participateAssetIssue();
+        // app.updateAsset();
+        // app.unfreezeAsset();
+        // app.getTransactionSignWeight();
+        // app.getTransactionApprovedList();
+        // app.accountPermissionUpdate();
         // trc20Demo.getName();
         // trc20Demo.getSymbol();
         // trc20Demo.getDecimals();
@@ -961,5 +964,7 @@ public class App {
         // trc20Demo.transferFrom();
         // trc20Demo.approve();
         // trc20Demo.getAllowance();
+
+        scDemo.deploySmartContract();
     }
 }
