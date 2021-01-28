@@ -27,7 +27,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 public class SmartContractDemo {
-    private final TronClient client = TronClient.ofNile("7c3a547f37cf82c7bd7cead99e53fd9a7d3bf6a3c8bd3c8541ad572322d16e42");
+    TronClient c = TronClient.ofNile("your pri key");
 
     /**
      * deploy a smart contract with its bytecode and abi.
@@ -97,9 +97,8 @@ public class SmartContractDemo {
                 "}";
 
             Contract cntr = new Contract.Builder()
-                                    .setClient(client)
-                                    .setOwnerAddr(client.parseAddress("TFRgpvvNTe8bwC666D6orYhEkCcYsbax8U"))
-                                    .setOriginAddr(client.parseAddress("TFRgpvvNTe8bwC666D6orYhEkCcYsbax8U"))
+                                    .setOwnerAddr(c.parseAddress("TFRgpvvNTe8bwC666D6orYhEkCcYsbax8U"))
+                                    .setOriginAddr(c.parseAddress("TFRgpvvNTe8bwC666D6orYhEkCcYsbax8U"))
                                     .setBytecode(ByteString.copyFrom(Numeric.hexStringToByteArray(bytecode)))
                                     .setAbi(abi)
                                     // .setCallValue()
@@ -107,6 +106,7 @@ public class SmartContractDemo {
                                     // .setConsumeUserResourcePercent()
                                     // .setOriginEnergyLimit()
                                     .build();
+            cntr.setClient(c);
         
             TransactionBuilder builder = cntr.deploy();
             //use the following method with parameters to call if has any TRC-10 deposit
@@ -114,10 +114,10 @@ public class SmartContractDemo {
             builder.setFeeLimit(1000000000L);
             builder.setMemo("Let's go!");
             //sign transaction
-            Transaction signedTxn = client.signTransaction(builder.build());
+            Transaction signedTxn = c.signTransaction(builder.build());
             System.out.println(signedTxn.toString());
             //broadcast transaction
-            TransactionReturn ret = client.broadcastTransaction(signedTxn);
+            TransactionReturn ret = c.broadcastTransaction(signedTxn);
             System.out.println("======== Result ========\n" + ret.toString());
         } catch (Exception e) {
             e.printStackTrace();
@@ -129,7 +129,7 @@ public class SmartContractDemo {
      */
     public void getSmartContract() {
         try {
-            Contract cntr = client.getContract("THi2qJf6XmvTJSpZHc17HgQsmJop6kb3ia");
+            Contract cntr = c.getContract("THi2qJf6XmvTJSpZHc17HgQsmJop6kb3ia");
             System.out.println("Contract name: " + cntr.getName());
             // System.out.println("Contract ABI: " + cntr.getAbi());
             System.out.println("Contract functions: " + cntr.getFunctions().size());
@@ -153,7 +153,7 @@ public class SmartContractDemo {
         Function name = new Function("name",
                 Collections.emptyList(), Arrays.asList(new TypeReference<Utf8String>() {}));
 
-        TransactionExtention txnExt = client.constantCall("TVjsyZ7fYF3qLF6BQgPmTEZy1xrNNyVAAA", 
+        TransactionExtention txnExt = c.constantCall("TVjsyZ7fYF3qLF6BQgPmTEZy1xrNNyVAAA", 
                 "TF17BgPaZYbz8oxbjhriubPDsA7ArKoLX3", name);
         //Convert constant result to human readable text
         String result = Numeric.toHexString(txnExt.getConstantResult(0).toByteArray());
