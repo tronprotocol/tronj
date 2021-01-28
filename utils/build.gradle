@@ -8,7 +8,7 @@ dependencies {
     implementation 'io.vertx:vertx-core:3.5.0.Beta1'
     implementation 'io.netty:netty-all:4.0.15.Final'
     implementation 'com.google.guava:guava:29.0-jre'
-    implementation "org.bouncycastle:bcprov-jdk15on:$bouncycastleVersion"
+    implementation "org.bouncycastle:bcprov-jdk15on:1.68"
     // implementation 'org.apache.tuweni:tuweni-bytes:0.8.2'
     // implementation 'org.apache.tuweni:tuweni-units:0.8.2'
 
