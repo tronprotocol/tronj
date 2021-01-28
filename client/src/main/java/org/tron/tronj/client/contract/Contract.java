@@ -370,6 +370,9 @@ public class Contract {
         if (tokenId != 0) {
             createSmartContractBuilder.setTokenId(tokenId);
             createSmartContractBuilder.setCallTokenValue(callTokenValue);
+        } else {
+            createSmartContractBuilder.setTokenId(0);
+            createSmartContractBuilder.setCallTokenValue(0);
         }
 
         return new TransactionBuilder(client.blockingStub.deployContract(createSmartContractBuilder.build()).getTransaction());
@@ -382,8 +385,7 @@ public class Contract {
      * @throws InvalidProtocolBufferException if the input is not valid JSON format or there are unknown fields in the input
      */
     public static void loadAbiFromJson(String abiString, ABI.Builder builder) throws Exception {
-        JsonFormat.Parser parser = JsonFormat.parser();
-        parser.merge(abiString, builder);
+        JsonFormat.parser().ignoringUnknownFields().merge(abiString, builder);
     }
     
 }

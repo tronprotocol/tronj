@@ -19,6 +19,7 @@ import org.tron.tronj.proto.Common.SmartContract.ABI;
 import org.tron.tronj.proto.Response.TransactionExtention;
 import org.tron.tronj.proto.Response.TransactionReturn;
 import org.tron.tronj.utils.Base58Check;
+import org.tron.tronj.utils.Numeric;
 
 import com.google.protobuf.ByteString;
 
@@ -71,12 +72,35 @@ public class SmartContractDemo {
                            "f6e58206304a660fbed31eff4077ef91f51652f50c" +
                            "642cdd52d505857b0b3f17e51e1a864736f6c634300050e0031";
 
-            String abi = "{\"constant\":true,\"inputs\":[],\"name\":\"get\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"x\",\"type\":\"uint256\"}],\"name\":\"set\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}";
+            String abi = "{\n" +
+                "\t\"entrys\": [{\n" +
+                "\t\t\"inputs\": [],\n" +
+                "\t\t\"name\": \"get\",\n" +
+                "\t\t\"outputs\": [{\n" +
+                "\t\t\t\"internalType\": \"uint256\",\n" +
+                "\t\t\t\"name\": \"\",\n" +
+                "\t\t\t\"type\": \"uint256\"\n" +
+                "\t\t}],\n" +
+                "\t\t\"stateMutability\": \"view\",\n" +
+                "\t\t\"type\": \"function\"\n" +
+                "\t}, {\n" +
+                "\t\t\"inputs\": [{\n" +
+                "\t\t\t\"internalType\": \"uint256\",\n" +
+                "\t\t\t\"name\": \"x\",\n" +
+                "\t\t\t\"type\": \"uint256\"\n" +
+                "\t\t}],\n" +
+                "\t\t\"name\": \"set\",\n" +
+                "\t\t\"outputs\": [],\n" +
+                "\t\t\"stateMutability\": \"nonpayable\",\n" +
+                "\t\t\"type\": \"function\"\n" +
+                "\t}]\n" +
+                "}";
 
             Contract cntr = new Contract.Builder()
                                     .setClient(client)
-                                    .setOwnerAddr(ByteString.copyFromUtf8("TFRgpvvNTe8bwC666D6orYhEkCcYsbax8U"))
-                                    .setBytecode(ByteString.copyFromUtf8(bytecode))
+                                    .setOwnerAddr(client.parseAddress("TFRgpvvNTe8bwC666D6orYhEkCcYsbax8U"))
+                                    .setOriginAddr(client.parseAddress("TFRgpvvNTe8bwC666D6orYhEkCcYsbax8U"))
+                                    .setBytecode(ByteString.copyFrom(Numeric.hexStringToByteArray(bytecode)))
                                     .setAbi(abi)
                                     // .setCallValue()
                                     // .setName()
@@ -96,7 +120,7 @@ public class SmartContractDemo {
             TransactionReturn ret = client.broadcastTransaction(signedTxn);
             System.out.println("======== Result ========\n" + ret.toString());
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
     }
 
@@ -129,11 +153,11 @@ public class SmartContractDemo {
         Function name = new Function("name",
                 Collections.emptyList(), Arrays.asList(new TypeReference<Utf8String>() {}));
 
-        TransactionExtention txnExt = client.constantCall(Base58Check.bytesToBase58(ownerAddr.toByteArray()), 
-                Base58Check.bytesToBase58(cntrAddr.toByteArray()), name);
+        TransactionExtention txnExt = client.constantCall("TVjsyZ7fYF3qLF6BQgPmTEZy1xrNNyVAAA", 
+                "TF17BgPaZYbz8oxbjhriubPDsA7ArKoLX3", name);
         //Convert constant result to human readable text
         String result = Numeric.toHexString(txnExt.getConstantResult(0).toByteArray());
-        return (String)FunctionReturnDecoder.decode(result, name.getOutputParameters()).get(0).getValue();
+        System.out.println((String)FunctionReturnDecoder.decode(result, name.getOutputParameters()).get(0).getValue());
     }
 
 }
