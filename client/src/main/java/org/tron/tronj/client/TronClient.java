@@ -970,22 +970,8 @@ public class TronClient {
                                                  String url, long freeAssetNetLimit,
                                                  long publicFreeAssetNetLimit, int precision, long fronzenAmount, long frozenDay, String description) throws IllegalException {
 
-        ByteString bsAddress = parseAddress(ownerAddress);
-
-        AssetIssueContract.Builder builder = AssetIssueContract.newBuilder()
-                .setOwnerAddress(bsAddress)
-                .setName(ByteString.copyFrom(name.getBytes()))
-                .setAbbr(ByteString.copyFrom(abbr.getBytes()))
-                .setTotalSupply(totalSupply)
-                .setTrxNum(trxNum)
-                .setNum(icoNum)
-                .setStartTime(startTime)
-                .setEndTime(endTime)
-                .setUrl(ByteString.copyFrom(url.getBytes()))
-                .setFreeAssetNetLimit(freeAssetNetLimit)
-                .setPublicFreeAssetNetLimit(publicFreeAssetNetLimit)
-                .setPrecision(precision)
-                .setDescription(ByteString.copyFrom(description.getBytes()));
+        AssetIssueContract.Builder builder = assetIssueContractBuilder(ownerAddress, name, abbr, totalSupply, trxNum, icoNum, startTime, endTime, url, freeAssetNetLimit,
+                publicFreeAssetNetLimit, precision, description);
 
         AssetIssueContract.FrozenSupply.Builder frozenBuilder = AssetIssueContract.FrozenSupply
                 .newBuilder();
@@ -1025,6 +1011,22 @@ public class TronClient {
                                                  String url, long freeAssetNetLimit,
                                                  long publicFreeAssetNetLimit, int precision, String description) throws IllegalException {
 
+        AssetIssueContract.Builder builder = assetIssueContractBuilder(ownerAddress, name, abbr, totalSupply, trxNum, icoNum, startTime, endTime, url, freeAssetNetLimit,
+        publicFreeAssetNetLimit, precision, description);
+
+        TransactionExtention transactionExtention = blockingStub.createAssetIssue2(builder.build());
+
+        if(SUCCESS != transactionExtention.getResult().getCode()){
+            throw new IllegalException(transactionExtention.getResult().getMessage().toStringUtf8());
+        }
+        return transactionExtention;
+    }
+
+    public AssetIssueContract.Builder assetIssueContractBuilder(String ownerAddress, String name, String abbr,
+                                                 long totalSupply, int trxNum, int icoNum, long startTime, long endTime,
+                                                 String url, long freeAssetNetLimit,
+                                                 long publicFreeAssetNetLimit, int precision, String description) throws IllegalException {
+
         ByteString bsAddress = parseAddress(ownerAddress);
 
         AssetIssueContract.Builder builder = AssetIssueContract.newBuilder()
@@ -1041,25 +1043,19 @@ public class TronClient {
                 .setPublicFreeAssetNetLimit(publicFreeAssetNetLimit)
                 .setPrecision(precision)
                 .setDescription(ByteString.copyFrom(description.getBytes()));
-
-        TransactionExtention transactionExtention = blockingStub.createAssetIssue2(builder.build());
-
-        if(SUCCESS != transactionExtention.getResult().getCode()){
-            throw new IllegalException(transactionExtention.getResult().getMessage().toStringUtf8());
-        }
-        return transactionExtention;
+        return builder;
     }
 
-    /**
-     * Update basic TRC10 token information
-     * @param ownerAddress Owner address, default hexString
-     * @param description The description of token, default hexString
-     * @param url The token's website url, default hexString
-     * @param newLimit Each token holder's free bandwidth
-     * @param newPublicLimit The total free bandwidth of the token
-     * @return TransactionExtention
-     * @throws IllegalException if fail to update asset
-     */
+        /**
+         * Update basic TRC10 token information
+         * @param ownerAddress Owner address, default hexString
+         * @param description The description of token, default hexString
+         * @param url The token's website url, default hexString
+         * @param newLimit Each token holder's free bandwidth
+         * @param newPublicLimit The total free bandwidth of the token
+         * @return TransactionExtention
+         * @throws IllegalException if fail to update asset
+         */
     public TransactionExtention updateAsset(String ownerAddress, String description, String url, int newLimit, int newPublicLimit) throws IllegalException {
         ByteString bsOwnerAddress = parseAddress(ownerAddress);
         ByteString bsDescription = ByteString.copyFrom(description.getBytes());
