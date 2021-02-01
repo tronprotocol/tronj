@@ -31,9 +31,7 @@ import org.tron.tronj.proto.Chain.Transaction;
 
 import org.tron.tronj.proto.Chain.Block;
 
-import org.tron.tronj.proto.Common;
 import org.tron.tronj.proto.Common.SmartContract;
-import org.tron.tronj.proto.Common.Permission;
 
 import org.tron.tronj.proto.Contract.TransferAssetContract;
 import org.tron.tronj.proto.Contract.UnfreezeBalanceContract;
@@ -73,7 +71,6 @@ import com.google.protobuf.ByteString;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
-import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.security.Key;
 import java.security.SignatureException;
@@ -95,9 +92,6 @@ import org.tron.tronj.proto.Response.ProposalList;
 import org.tron.tronj.proto.Response.ExchangeList;
 import org.tron.tronj.proto.Response.TransactionSignWeight;
 import org.tron.tronj.proto.Response.TransactionApprovedList;
-
-import com.google.protobuf.util.JsonFormat;
-import org.tron.tronj.utils.Numeric;
 
 import static org.tron.tronj.proto.Response.TransactionReturn.response_code.SUCCESS;
 
@@ -1012,7 +1006,7 @@ public class TronClient {
                                                  long publicFreeAssetNetLimit, int precision, String description) throws IllegalException {
 
         AssetIssueContract.Builder builder = assetIssueContractBuilder(ownerAddress, name, abbr, totalSupply, trxNum, icoNum, startTime, endTime, url, freeAssetNetLimit,
-        publicFreeAssetNetLimit, precision, description);
+                publicFreeAssetNetLimit, precision, description);
 
         TransactionExtention transactionExtention = blockingStub.createAssetIssue2(builder.build());
 
@@ -1025,7 +1019,7 @@ public class TronClient {
     public AssetIssueContract.Builder assetIssueContractBuilder(String ownerAddress, String name, String abbr,
                                                  long totalSupply, int trxNum, int icoNum, long startTime, long endTime,
                                                  String url, long freeAssetNetLimit,
-                                                 long publicFreeAssetNetLimit, int precision, String description) throws IllegalException {
+                                                 long publicFreeAssetNetLimit, int precision, String description) {
 
         ByteString bsAddress = parseAddress(ownerAddress);
 
