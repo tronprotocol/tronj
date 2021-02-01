@@ -19,6 +19,7 @@ import org.tron.tronj.proto.Common.SmartContract.ABI;
 import org.tron.tronj.proto.Response.TransactionExtention;
 import org.tron.tronj.proto.Response.TransactionReturn;
 import org.tron.tronj.utils.Base58Check;
+import org.tron.tronj.utils.Numeric;
 
 import com.google.protobuf.ByteString;
 
@@ -26,7 +27,7 @@ import java.util.Arrays;
 import java.util.Collections;
 
 public class SmartContractDemo {
-    private final TronClient client = TronClient.ofNile("7c3a547f37cf82c7bd7cead99e53fd9a7d3bf6a3c8bd3c8541ad572322d16e42");
+    TronClient c = TronClient.ofNile("your pri key");
 
     /**
      * deploy a smart contract with its bytecode and abi.
@@ -71,18 +72,41 @@ public class SmartContractDemo {
                            "f6e58206304a660fbed31eff4077ef91f51652f50c" +
                            "642cdd52d505857b0b3f17e51e1a864736f6c634300050e0031";
 
-            String abi = "{\"constant\":true,\"inputs\":[],\"name\":\"get\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"x\",\"type\":\"uint256\"}],\"name\":\"set\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}";
+            String abi = "{\n" +
+                "\t\"entrys\": [{\n" +
+                "\t\t\"inputs\": [],\n" +
+                "\t\t\"name\": \"get\",\n" +
+                "\t\t\"outputs\": [{\n" +
+                "\t\t\t\"internalType\": \"uint256\",\n" +
+                "\t\t\t\"name\": \"\",\n" +
+                "\t\t\t\"type\": \"uint256\"\n" +
+                "\t\t}],\n" +
+                "\t\t\"stateMutability\": \"view\",\n" +
+                "\t\t\"type\": \"function\"\n" +
+                "\t}, {\n" +
+                "\t\t\"inputs\": [{\n" +
+                "\t\t\t\"internalType\": \"uint256\",\n" +
+                "\t\t\t\"name\": \"x\",\n" +
+                "\t\t\t\"type\": \"uint256\"\n" +
+                "\t\t}],\n" +
+                "\t\t\"name\": \"set\",\n" +
+                "\t\t\"outputs\": [],\n" +
+                "\t\t\"stateMutability\": \"nonpayable\",\n" +
+                "\t\t\"type\": \"function\"\n" +
+                "\t}]\n" +
+                "}";
 
             Contract cntr = new Contract.Builder()
-                                    .setClient(client)
-                                    .setOwnerAddr(ByteString.copyFromUtf8("TFRgpvvNTe8bwC666D6orYhEkCcYsbax8U"))
-                                    .setBytecode(ByteString.copyFromUtf8(bytecode))
+                                    .setOwnerAddr(c.parseAddress("TFRgpvvNTe8bwC666D6orYhEkCcYsbax8U"))
+                                    .setOriginAddr(c.parseAddress("TFRgpvvNTe8bwC666D6orYhEkCcYsbax8U"))
+                                    .setBytecode(ByteString.copyFrom(Numeric.hexStringToByteArray(bytecode)))
                                     .setAbi(abi)
                                     // .setCallValue()
                                     // .setName()
                                     // .setConsumeUserResourcePercent()
                                     // .setOriginEnergyLimit()
                                     .build();
+            cntr.setClient(c);
         
             TransactionBuilder builder = cntr.deploy();
             //use the following method with parameters to call if has any TRC-10 deposit
@@ -90,13 +114,13 @@ public class SmartContractDemo {
             builder.setFeeLimit(1000000000L);
             builder.setMemo("Let's go!");
             //sign transaction
-            Transaction signedTxn = client.signTransaction(builder.build());
+            Transaction signedTxn = c.signTransaction(builder.build());
             System.out.println(signedTxn.toString());
             //broadcast transaction
-            TransactionReturn ret = client.broadcastTransaction(signedTxn);
+            TransactionReturn ret = c.broadcastTransaction(signedTxn);
             System.out.println("======== Result ========\n" + ret.toString());
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
     }
 
@@ -105,7 +129,7 @@ public class SmartContractDemo {
      */
     public void getSmartContract() {
         try {
-            Contract cntr = client.getContract("THi2qJf6XmvTJSpZHc17HgQsmJop6kb3ia");
+            Contract cntr = c.getContract("THi2qJf6XmvTJSpZHc17HgQsmJop6kb3ia");
             System.out.println("Contract name: " + cntr.getName());
             // System.out.println("Contract ABI: " + cntr.getAbi());
             System.out.println("Contract functions: " + cntr.getFunctions().size());
@@ -129,11 +153,11 @@ public class SmartContractDemo {
         Function name = new Function("name",
                 Collections.emptyList(), Arrays.asList(new TypeReference<Utf8String>() {}));
 
-        TransactionExtention txnExt = client.constantCall(Base58Check.bytesToBase58(ownerAddr.toByteArray()), 
-                Base58Check.bytesToBase58(cntrAddr.toByteArray()), name);
+        TransactionExtention txnExt = c.constantCall("TVjsyZ7fYF3qLF6BQgPmTEZy1xrNNyVAAA", 
+                "TF17BgPaZYbz8oxbjhriubPDsA7ArKoLX3", name);
         //Convert constant result to human readable text
         String result = Numeric.toHexString(txnExt.getConstantResult(0).toByteArray());
-        return (String)FunctionReturnDecoder.decode(result, name.getOutputParameters()).get(0).getValue();
+        System.out.println((String)FunctionReturnDecoder.decode(result, name.getOutputParameters()).get(0).getValue());
     }
 
 }
