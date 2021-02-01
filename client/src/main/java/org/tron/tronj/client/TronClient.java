@@ -1002,6 +1002,55 @@ public class TronClient {
     }
 
     /**
+     * Issue a token
+     * @param ownerAddress Owner address, default hexString
+     * @param name Token name, default hexString
+     * @param abbr Token name abbreviation, default hexString
+     * @param totalSupply Token total supply
+     * @param trxNum Define the price by the ratio of trx_num/num
+     * @param icoNum Define the price by the ratio of trx_num/num
+     * @param startTime ICO start time
+     * @param endTime ICO end time
+     * @param url Token official website url, default hexString
+     * @param freeAssetNetLimit Token free asset net limit
+     * @param publicFreeAssetNetLimit Token public free asset net limit
+     * @param precision
+     * @param description Token description, default hexString
+     * @return TransactionExtention
+     * @throws IllegalException if fail to create AssetIssue
+     */
+
+    public TransactionExtention createAssetIssue(String ownerAddress, String name, String abbr,
+                                                 long totalSupply, int trxNum, int icoNum, long startTime, long endTime,
+                                                 String url, long freeAssetNetLimit,
+                                                 long publicFreeAssetNetLimit, int precision, String description) throws IllegalException {
+
+        ByteString bsAddress = parseAddress(ownerAddress);
+
+        AssetIssueContract.Builder builder = AssetIssueContract.newBuilder()
+                .setOwnerAddress(bsAddress)
+                .setName(ByteString.copyFrom(name.getBytes()))
+                .setAbbr(ByteString.copyFrom(abbr.getBytes()))
+                .setTotalSupply(totalSupply)
+                .setTrxNum(trxNum)
+                .setNum(icoNum)
+                .setStartTime(startTime)
+                .setEndTime(endTime)
+                .setUrl(ByteString.copyFrom(url.getBytes()))
+                .setFreeAssetNetLimit(freeAssetNetLimit)
+                .setPublicFreeAssetNetLimit(publicFreeAssetNetLimit)
+                .setPrecision(precision)
+                .setDescription(ByteString.copyFrom(description.getBytes()));
+
+        TransactionExtention transactionExtention = blockingStub.createAssetIssue2(builder.build());
+
+        if(SUCCESS != transactionExtention.getResult().getCode()){
+            throw new IllegalException(transactionExtention.getResult().getMessage().toStringUtf8());
+        }
+        return transactionExtention;
+    }
+
+    /**
      * Update basic TRC10 token information
      * @param ownerAddress Owner address, default hexString
      * @param description The description of token, default hexString
