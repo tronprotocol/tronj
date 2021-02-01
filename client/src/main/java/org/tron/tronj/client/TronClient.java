@@ -952,8 +952,7 @@ public class TronClient {
      * @param freeAssetNetLimit Token free asset net limit
      * @param publicFreeAssetNetLimit Token public free asset net limit
      * @param precision
-     * @param fronzenAmount fronzen amount
-     * @param frozenDay fronzen day
+     * @param frozenSupply HashMap<frozenDay, frozenAmount>
      * @param description Token description, default hexString
      * @return TransactionExtention
      * @throws IllegalException if fail to create AssetIssue
@@ -962,16 +961,21 @@ public class TronClient {
     public TransactionExtention createAssetIssue(String ownerAddress, String name, String abbr,
                                                  long totalSupply, int trxNum, int icoNum, long startTime, long endTime,
                                                  String url, long freeAssetNetLimit,
-                                                 long publicFreeAssetNetLimit, int precision, long fronzenAmount, long frozenDay, String description) throws IllegalException {
+                                                 long publicFreeAssetNetLimit, int precision, HashMap<String, String> frozenSupply, String description) throws IllegalException {
 
         AssetIssueContract.Builder builder = assetIssueContractBuilder(ownerAddress, name, abbr, totalSupply, trxNum, icoNum, startTime, endTime, url, freeAssetNetLimit,
                 publicFreeAssetNetLimit, precision, description);
 
-        AssetIssueContract.FrozenSupply.Builder frozenBuilder = AssetIssueContract.FrozenSupply
-                .newBuilder();
-        frozenBuilder.setFrozenAmount(fronzenAmount);
-        frozenBuilder.setFrozenDays(frozenDay);
-        builder.addFrozenSupply(0, frozenBuilder);
+        for (String daysStr : frozenSupply.keySet()) {
+            String amountStr = frozenSupply.get(daysStr);
+            long amount = Long.parseLong(amountStr);
+            long days = Long.parseLong(daysStr);
+            AssetIssueContract.FrozenSupply.Builder frozenBuilder = AssetIssueContract.FrozenSupply
+                    .newBuilder();
+            frozenBuilder.setFrozenAmount(amount);
+            frozenBuilder.setFrozenDays(days);
+            builder.addFrozenSupply(frozenBuilder.build());
+        }
 
         TransactionExtention transactionExtention = blockingStub.createAssetIssue2(builder.build());
 
