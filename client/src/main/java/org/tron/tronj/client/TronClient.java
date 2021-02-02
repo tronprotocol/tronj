@@ -99,13 +99,20 @@ public class TronClient {
     public final WalletGrpc.WalletBlockingStub blockingStub;
     public final WalletSolidityGrpc.WalletSolidityBlockingStub blockingStubSolidity;
     public final SECP256K1.KeyPair keyPair;
+    public final ManagedChannel channel;
+    public final ManagedChannel channelSolidity;
 
     public TronClient(String grpcEndpoint, String grpcEndpointSolidity, String hexPrivateKey) {
-        ManagedChannel channel = ManagedChannelBuilder.forTarget(grpcEndpoint).usePlaintext().build();
-        ManagedChannel channelSolidity = ManagedChannelBuilder.forTarget(grpcEndpointSolidity).usePlaintext().build();
+        channel = ManagedChannelBuilder.forTarget(grpcEndpoint).usePlaintext().build();
+        channelSolidity = ManagedChannelBuilder.forTarget(grpcEndpointSolidity).usePlaintext().build();
         blockingStub = WalletGrpc.newBlockingStub(channel);
         blockingStubSolidity = WalletSolidityGrpc.newBlockingStub(channelSolidity);
         keyPair = SECP256K1.KeyPair.create(SECP256K1.PrivateKey.create(Bytes32.fromHexString(hexPrivateKey)));
+    }
+
+    public void close() {
+        channel.shutdown();
+        channelSolidity.shutdown();
     }
 
     /*public TronClient(Channel channel, String hexPrivateKey) {
