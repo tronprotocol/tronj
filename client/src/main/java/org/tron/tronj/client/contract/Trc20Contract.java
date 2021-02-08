@@ -47,7 +47,7 @@ public class Trc20Contract extends Contract {
       *
       * Returns the name of the token - e.g. "MyToken".
       *
-      * @return A TransactionExtention object contains constant result to resolve
+      * @return the name of the token
       */
       public String name() {
         Function name = new Function("name",
@@ -65,7 +65,7 @@ public class Trc20Contract extends Contract {
       *
       * Returns the symbol of the token. E.g. "HIX".
       *
-      * @return A TransactionExtention object contains constant result to resolve
+      * @return the symbol of the token
       */
       public String symbol() {
         Function symbol = new Function("symbol",
@@ -84,7 +84,7 @@ public class Trc20Contract extends Contract {
        * Returns the number of decimals the token uses - e.g. 8, 
        * means to divide the token amount by 100000000 to get its user representation
        * 
-       * @return A TransactionExtention object contains constant result to resolve
+       * @return the number of decimals the token uses
        */
       public BigInteger decimals() {
         Function decimals = new Function("decimals",
@@ -102,7 +102,7 @@ public class Trc20Contract extends Contract {
        * 
        * Returns the total token supply.
        * 
-       * @return A TransactionExtention object contains constant result to resolve
+       * @return the total token supply
        */
       public BigInteger totalSupply() {
         Function totalSupply = new Function("totalSupply",
@@ -123,7 +123,7 @@ public class Trc20Contract extends Contract {
        * @param accountAddr The token owner's address
        * @param callerAddr The caller's address
        * @param cntrAddr The contract's address
-       * @return A TransactionExtention object contains constant result to resolve
+       * @return the account balance of another account with address _owner
        */
       public BigInteger balanceOf(String accountAddr) {
         Function balanceOf = new Function("balanceOf",
@@ -230,7 +230,7 @@ public class Trc20Contract extends Contract {
        * @param spender The address of the withdrawer.
        * @param callerAddr The caller's address
        * @param cntrAddr The contract's address
-       * @return A TransactionExtention object contains constant result to resolve
+       * @return the amount which _spender is still allowed to withdraw from _owner
        */
       public BigInteger allowance(String owner, String spender) {
         Function allowance = new Function("allowance",

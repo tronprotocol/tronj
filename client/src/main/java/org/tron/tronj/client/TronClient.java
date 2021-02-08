@@ -15,6 +15,7 @@ package org.tron.tronj.client;
  */
 
 
+import com.google.protobuf.InvalidProtocolBufferException;
 import org.tron.tronj.abi.FunctionEncoder;
 import org.tron.tronj.abi.datatypes.Function;
 import org.tron.tronj.api.GrpcAPI.BytesMessage;
@@ -41,6 +42,12 @@ import org.tron.tronj.proto.Contract.TriggerSmartContract;
 import org.tron.tronj.proto.Contract.AccountUpdateContract;
 import org.tron.tronj.proto.Contract.AccountCreateContract;
 import org.tron.tronj.proto.Contract.AssetIssueContract;
+import org.tron.tronj.proto.Contract.SetAccountIdContract;
+import org.tron.tronj.proto.Contract.UpdateEnergyLimitContract;
+import org.tron.tronj.proto.Contract.UpdateAssetContract;
+import org.tron.tronj.proto.Contract.ParticipateAssetIssueContract;
+import org.tron.tronj.proto.Contract.UnfreezeAssetContract;
+import org.tron.tronj.proto.Contract.AccountPermissionUpdateContract;
 import org.tron.tronj.proto.Response.TransactionExtention;
 import org.tron.tronj.proto.Response.TransactionReturn;
 import org.tron.tronj.proto.Response.NodeInfo;
@@ -52,9 +59,11 @@ import org.tron.tronj.proto.Response.Exchange;
 import org.tron.tronj.proto.Response.DelegatedResourceMessage;
 import org.tron.tronj.proto.Response.DelegatedResourceList;
 import org.tron.tronj.proto.Response.DelegatedResourceAccountIndex;
+import org.tron.tronj.proto.Response.TransactionSign;
 import org.tron.tronj.api.GrpcAPI.NumberMessage;
 import org.tron.tronj.api.GrpcAPI.EmptyMessage;
 import org.tron.tronj.api.GrpcAPI.AccountAddressMessage;
+import org.tron.tronj.api.GrpcAPI.AccountIdMessage;
 import org.tron.tronj.api.GrpcAPI.BlockLimit;
 import org.tron.tronj.api.GrpcAPI.PaginatedMessage;
 import org.tron.tronj.utils.Base58Check;
@@ -63,6 +72,8 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
 import java.nio.ByteBuffer;
+import java.security.Key;
+import java.security.SignatureException;
 import java.util.*;
 
 import org.tron.tronj.crypto.tuweniTypes.Bytes32;
@@ -79,7 +90,8 @@ import org.tron.tronj.proto.Response.ChainParameters;
 import org.tron.tronj.proto.Response.AssetIssueList;
 import org.tron.tronj.proto.Response.ProposalList;
 import org.tron.tronj.proto.Response.ExchangeList;
-import org.tron.tronj.utils.Numeric;
+import org.tron.tronj.proto.Response.TransactionSignWeight;
+import org.tron.tronj.proto.Response.TransactionApprovedList;
 
 import static org.tron.tronj.proto.Response.TransactionReturn.response_code.SUCCESS;
 
@@ -87,13 +99,20 @@ public class TronClient {
     public final WalletGrpc.WalletBlockingStub blockingStub;
     public final WalletSolidityGrpc.WalletSolidityBlockingStub blockingStubSolidity;
     public final SECP256K1.KeyPair keyPair;
+    public final ManagedChannel channel;
+    public final ManagedChannel channelSolidity;
 
     public TronClient(String grpcEndpoint, String grpcEndpointSolidity, String hexPrivateKey) {
-        ManagedChannel channel = ManagedChannelBuilder.forTarget(grpcEndpoint).usePlaintext().build();
-        ManagedChannel channelSolidity = ManagedChannelBuilder.forTarget(grpcEndpointSolidity).usePlaintext().build();
+        channel = ManagedChannelBuilder.forTarget(grpcEndpoint).usePlaintext().build();
+        channelSolidity = ManagedChannelBuilder.forTarget(grpcEndpointSolidity).usePlaintext().build();
         blockingStub = WalletGrpc.newBlockingStub(channel);
         blockingStubSolidity = WalletSolidityGrpc.newBlockingStub(channelSolidity);
         keyPair = SECP256K1.KeyPair.create(SECP256K1.PrivateKey.create(Bytes32.fromHexString(hexPrivateKey)));
+    }
+
+    public void close() {
+        channel.shutdown();
+        channelSolidity.shutdown();
     }
 
     /*public TronClient(Channel channel, String hexPrivateKey) {
@@ -470,6 +489,7 @@ public class TronClient {
         return transactionExtention;
     }
 
+
     /**
      * Query the latest block information
      * @return Block
@@ -661,6 +681,32 @@ public class TronClient {
         return blockingStub.getAccountNet(account);
     }
 
+    public long getAccountBalance(String address) {
+        Account account = getAccount(address);
+        long balance = account.getBalance();
+        return balance;
+    }
+
+
+    public Account getAccountById(String id) {
+        ByteString bsId = ByteString.copyFrom(id.getBytes());
+        AccountIdMessage accountId = AccountIdMessage.newBuilder()
+                .setId(bsId)
+                .build();
+        return blockingStub.getAccountById(accountId);
+    }
+
+    public Transaction setAccountId(String id, String address) throws IllegalException {
+        ByteString bsId = ByteString.copyFrom(id.getBytes());
+        ByteString bsAddress = parseAddress(address);
+
+        SetAccountIdContract contract = createSetAccountIdContract(bsId, bsAddress);
+
+        Transaction transaction= blockingStub.setAccountId(contract);
+
+        return transaction;
+    }
+
     /**
      * All parameters that the blockchain committee can set
      * @return ChainParameters
@@ -682,7 +728,7 @@ public class TronClient {
      * @return DelegatedResourceList
      */
     public DelegatedResourceList getDelegatedResource(String fromAddress,
-                                                                String toAddress) {
+                                                      String toAddress) {
 
         ByteString fromAddressBS = parseAddress(fromAddress);
         ByteString toAddressBS = parseAddress(toAddress);
@@ -769,6 +815,66 @@ public class TronClient {
     }
 
     /**
+     * Query a token by token name
+     * @param name the name of the TRC10 token
+     * @return AssetIssueContract, the token object, which contains the token name
+     */
+    public AssetIssueContract getAssetIssueByName(String name) {
+        ByteString assetNameBs = ByteString.copyFrom(name.getBytes());
+        BytesMessage request = BytesMessage.newBuilder()
+                .setValue(assetNameBs)
+                .build();
+
+        AssetIssueContract assetIssueContract = blockingStub.getAssetIssueByName(request);
+        return assetIssueContract;
+    }
+
+    /**
+     * Query the list of all the TRC10 tokens by token name
+     * @param name the name of the TRC10 token
+     * @return AssetIssueList
+     */
+    public AssetIssueList getAssetIssueListByName(String name) {
+        ByteString assetNameBs = ByteString.copyFrom(name.getBytes());
+        BytesMessage request = BytesMessage.newBuilder()
+                .setValue(assetNameBs)
+                .build();
+
+        AssetIssueList assetIssueList = blockingStub.getAssetIssueListByName(request);
+        return assetIssueList;
+    }
+
+    /**
+     * Participate a token
+     * @param toAddress the issuer address of the token, default hexString
+     * @param ownerAddress the participant address, default hexString
+     * @param assertName token id, default hexString
+     * @param amount participate token amount
+     * @return TransactionExtention
+     * @throws IllegalException if fail to participate AssetIssue
+     */
+    public TransactionExtention participateAssetIssue(String toAddress, String ownerAddress, String assertName, long amount) throws IllegalException {
+
+        ByteString bsTo = parseAddress(toAddress);
+        ByteString bsOwner = parseAddress(ownerAddress);
+        ByteString bsName = ByteString.copyFrom(assertName.getBytes());
+
+        ParticipateAssetIssueContract builder = ParticipateAssetIssueContract.newBuilder()
+                .setToAddress(bsTo)
+                .setAssetName(bsName)
+                .setOwnerAddress(bsOwner)
+                .setAmount(amount)
+                .build();
+
+        TransactionExtention transactionExtention = blockingStub.participateAssetIssue2(builder);
+        if(SUCCESS != transactionExtention.getResult().getCode()){
+            throw new IllegalException(transactionExtention.getResult().getMessage().toStringUtf8());
+        }
+        return transactionExtention;
+    }
+
+
+    /**
      * List all proposals
      * @return ProposalList
      */
@@ -837,6 +943,199 @@ public class TronClient {
             throw new IllegalException();
         }
         return exchange;
+    }
+
+    /**
+     * Issue a token
+     * @param ownerAddress Owner address, default hexString
+     * @param name Token name, default hexString
+     * @param abbr Token name abbreviation, default hexString
+     * @param totalSupply Token total supply
+     * @param trxNum Define the price by the ratio of trx_num/num
+     * @param icoNum Define the price by the ratio of trx_num/num
+     * @param startTime ICO start time
+     * @param endTime ICO end time
+     * @param url Token official website url, default hexString
+     * @param freeAssetNetLimit Token free asset net limit
+     * @param publicFreeAssetNetLimit Token public free asset net limit
+     * @param precision
+     * @param frozenSupply HashMap<frozenDay, frozenAmount>
+     * @param description Token description, default hexString
+     * @return TransactionExtention
+     * @throws IllegalException if fail to create AssetIssue
+     */
+
+    public TransactionExtention createAssetIssue(String ownerAddress, String name, String abbr,
+                                                 long totalSupply, int trxNum, int icoNum, long startTime, long endTime,
+                                                 String url, long freeAssetNetLimit,
+                                                 long publicFreeAssetNetLimit, int precision, HashMap<String, String> frozenSupply, String description) throws IllegalException {
+
+        AssetIssueContract.Builder builder = assetIssueContractBuilder(ownerAddress, name, abbr, totalSupply, trxNum, icoNum, startTime, endTime, url, freeAssetNetLimit,
+                publicFreeAssetNetLimit, precision, description);
+
+        for (String daysStr : frozenSupply.keySet()) {
+            String amountStr = frozenSupply.get(daysStr);
+            long amount = Long.parseLong(amountStr);
+            long days = Long.parseLong(daysStr);
+            AssetIssueContract.FrozenSupply.Builder frozenBuilder = AssetIssueContract.FrozenSupply
+                    .newBuilder();
+            frozenBuilder.setFrozenAmount(amount);
+            frozenBuilder.setFrozenDays(days);
+            builder.addFrozenSupply(frozenBuilder.build());
+        }
+
+        TransactionExtention transactionExtention = blockingStub.createAssetIssue2(builder.build());
+
+        if(SUCCESS != transactionExtention.getResult().getCode()){
+            throw new IllegalException(transactionExtention.getResult().getMessage().toStringUtf8());
+        }
+        return transactionExtention;
+    }
+
+    /**
+     * Issue a token
+     * @param ownerAddress Owner address, default hexString
+     * @param name Token name, default hexString
+     * @param abbr Token name abbreviation, default hexString
+     * @param totalSupply Token total supply
+     * @param trxNum Define the price by the ratio of trx_num/num
+     * @param icoNum Define the price by the ratio of trx_num/num
+     * @param startTime ICO start time
+     * @param endTime ICO end time
+     * @param url Token official website url, default hexString
+     * @param freeAssetNetLimit Token free asset net limit
+     * @param publicFreeAssetNetLimit Token public free asset net limit
+     * @param precision
+     * @param description Token description, default hexString
+     * @return TransactionExtention
+     * @throws IllegalException if fail to create AssetIssue
+     */
+
+    public TransactionExtention createAssetIssue(String ownerAddress, String name, String abbr,
+                                                 long totalSupply, int trxNum, int icoNum, long startTime, long endTime,
+                                                 String url, long freeAssetNetLimit,
+                                                 long publicFreeAssetNetLimit, int precision, String description) throws IllegalException {
+
+        AssetIssueContract.Builder builder = assetIssueContractBuilder(ownerAddress, name, abbr, totalSupply, trxNum, icoNum, startTime, endTime, url, freeAssetNetLimit,
+                publicFreeAssetNetLimit, precision, description);
+
+        TransactionExtention transactionExtention = blockingStub.createAssetIssue2(builder.build());
+
+        if(SUCCESS != transactionExtention.getResult().getCode()){
+            throw new IllegalException(transactionExtention.getResult().getMessage().toStringUtf8());
+        }
+        return transactionExtention;
+    }
+
+    public AssetIssueContract.Builder assetIssueContractBuilder(String ownerAddress, String name, String abbr,
+                                                 long totalSupply, int trxNum, int icoNum, long startTime, long endTime,
+                                                 String url, long freeAssetNetLimit,
+                                                 long publicFreeAssetNetLimit, int precision, String description) {
+
+        ByteString bsAddress = parseAddress(ownerAddress);
+
+        AssetIssueContract.Builder builder = AssetIssueContract.newBuilder()
+                .setOwnerAddress(bsAddress)
+                .setName(ByteString.copyFrom(name.getBytes()))
+                .setAbbr(ByteString.copyFrom(abbr.getBytes()))
+                .setTotalSupply(totalSupply)
+                .setTrxNum(trxNum)
+                .setNum(icoNum)
+                .setStartTime(startTime)
+                .setEndTime(endTime)
+                .setUrl(ByteString.copyFrom(url.getBytes()))
+                .setFreeAssetNetLimit(freeAssetNetLimit)
+                .setPublicFreeAssetNetLimit(publicFreeAssetNetLimit)
+                .setPrecision(precision)
+                .setDescription(ByteString.copyFrom(description.getBytes()));
+        return builder;
+    }
+
+        /**
+         * Update basic TRC10 token information
+         * @param ownerAddress Owner address, default hexString
+         * @param description The description of token, default hexString
+         * @param url The token's website url, default hexString
+         * @param newLimit Each token holder's free bandwidth
+         * @param newPublicLimit The total free bandwidth of the token
+         * @return TransactionExtention
+         * @throws IllegalException if fail to update asset
+         */
+    public TransactionExtention updateAsset(String ownerAddress, String description, String url, int newLimit, int newPublicLimit) throws IllegalException {
+        ByteString bsOwnerAddress = parseAddress(ownerAddress);
+        ByteString bsDescription = ByteString.copyFrom(description.getBytes());
+        ByteString bsUrl = ByteString.copyFrom(url.getBytes());
+
+        UpdateAssetContract contract = createUpdateAssetContract(bsOwnerAddress,
+                bsDescription,bsUrl,newLimit,newPublicLimit);
+
+        TransactionExtention transactionExtention= blockingStub.updateAsset2(contract);
+
+        if(SUCCESS != transactionExtention.getResult().getCode()){
+            throw new IllegalException(transactionExtention.getResult().getMessage().toStringUtf8());
+        }
+
+        return transactionExtention;
+    }
+
+    /**
+     * Unfreeze a token that has passed the minimum freeze duration
+     * @param ownerAddress Owner address, default hexString
+     * @return TransactionExtention
+     * @throws IllegalException if fail to unfreeze asset
+     */
+    public TransactionExtention unfreezeAsset(String ownerAddress) throws IllegalException {
+        ByteString bsOwnerAddress = parseAddress(ownerAddress);
+
+        UnfreezeAssetContract contract = createUnfreezeAssetContract(bsOwnerAddress);
+
+        TransactionExtention transactionExtention= blockingStub.unfreezeAsset2(contract);
+
+        if(SUCCESS != transactionExtention.getResult().getCode()){
+            throw new IllegalException(transactionExtention.getResult().getMessage().toStringUtf8());
+        }
+
+        return transactionExtention;
+    }
+
+    /**
+     * Unfreeze a token that has passed the minimum freeze duration
+     * @param contract AccountPermissionUpdateContract
+     * @return TransactionExtention
+     * @throws IllegalException if fail to update account permission
+     */
+    public TransactionExtention accountPermissionUpdate(AccountPermissionUpdateContract contract) throws IllegalException {
+
+        TransactionExtention transactionExtention = blockingStub.accountPermissionUpdate(contract);
+
+        if(SUCCESS != transactionExtention.getResult().getCode()){
+            throw new IllegalException(transactionExtention.getResult().getMessage().toStringUtf8());
+        }
+        return transactionExtention;
+    }
+
+    /**
+     * Query transaction sign weight
+     * @param trx transaction object
+     * @return TransactionSignWeight
+     */
+    public TransactionSignWeight getTransactionSignWeight(Transaction trx) {
+
+        TransactionSignWeight transactionSignWeight = blockingStub.getTransactionSignWeight(trx);
+
+        return transactionSignWeight;
+    }
+
+    /**
+     * Query transaction approvedList
+     * @param trx transaction object
+     * @return TransactionApprovedList
+     */
+    public TransactionApprovedList getTransactionApprovedList(Transaction trx) throws InvalidProtocolBufferException {
+
+        TransactionApprovedList transactionApprovedList = blockingStub.getTransactionApprovedList(trx);
+
+        return transactionApprovedList;
     }
 
     //All other solidified APIs start
@@ -942,6 +1241,34 @@ public class TronClient {
         return builder.build();
     }
 
+    public static SetAccountIdContract createSetAccountIdContract(
+            ByteString accountId, ByteString address) {
+        SetAccountIdContract.Builder builder = SetAccountIdContract.newBuilder();
+        builder.setAccountId(accountId);
+        builder.setOwnerAddress(address);
+
+        return builder.build();
+    }
+
+
+    public static UpdateAssetContract createUpdateAssetContract(
+            ByteString address, ByteString description, ByteString url, long newLimit, long newPublicLimit) {
+        UpdateAssetContract.Builder builder = UpdateAssetContract.newBuilder();
+        builder.setDescription(description);
+        builder.setUrl(url);
+        builder.setNewLimit(newLimit);
+        builder.setNewPublicLimit(newPublicLimit);
+        builder.setOwnerAddress(address);
+
+        return builder.build();
+    }
+
+    public static UnfreezeAssetContract createUnfreezeAssetContract(ByteString address) {
+
+        UnfreezeAssetContract.Builder builder = UnfreezeAssetContract.newBuilder();
+        builder.setOwnerAddress(address);
+        return builder.build();
+    }
 
     /*public void transferTrc20(String from, String to, String cntr, long feeLimit, long amount, int precision) {
         System.out.println("============ TRC20 transfer =============");
@@ -988,22 +1315,22 @@ public class TronClient {
     public Contract getContract(String contractAddress) {
         ByteString rawAddr = parseAddress(contractAddress);
         BytesMessage param =
-            BytesMessage.newBuilder()
-            .setValue(rawAddr)
-            .build();
+                BytesMessage.newBuilder()
+                        .setValue(rawAddr)
+                        .build();
 
-            SmartContract cntr = blockingStub.getContract(param);
+        SmartContract cntr = blockingStub.getContract(param);
 
-            Contract contract =
+        Contract contract =
                 new Contract.Builder()
-                .setOriginAddr(cntr.getOriginAddress())
-                .setCntrAddr(cntr.getContractAddress())
-                .setBytecode(cntr.getBytecode())
-                .setName(cntr.getName())
-                .setAbi(cntr.getAbi())
-                .setOriginEnergyLimit(cntr.getOriginEnergyLimit())
-                .setConsumeUserResourcePercent(cntr.getConsumeUserResourcePercent())
-                .build();
+                        .setOriginAddr(cntr.getOriginAddress())
+                        .setCntrAddr(cntr.getContractAddress())
+                        .setBytecode(cntr.getBytecode())
+                        .setName(cntr.getName())
+                        .setAbi(cntr.getAbi())
+                        .setOriginEnergyLimit(cntr.getOriginEnergyLimit())
+                        .setConsumeUserResourcePercent(cntr.getConsumeUserResourcePercent())
+                        .build();
 
         return contract;
     }
@@ -1033,21 +1360,21 @@ public class TronClient {
      */
     private TransactionExtention callWithoutBroadcast(String ownerAddr, Contract cntr, Function function) {
         cntr.setOwnerAddr(parseAddress(ownerAddr));
-            String encodedHex = FunctionEncoder.encode(function);
-            // Make a TriggerSmartContract contract
-            TriggerSmartContract trigger =
+        String encodedHex = FunctionEncoder.encode(function);
+        // Make a TriggerSmartContract contract
+        TriggerSmartContract trigger =
                 TriggerSmartContract.newBuilder()
-                .setOwnerAddress(cntr.getOwnerAddr())
-                .setContractAddress(cntr.getCntrAddr())
-                .setData(parseHex(encodedHex))
-                .build();
+                        .setOwnerAddress(cntr.getOwnerAddr())
+                        .setContractAddress(cntr.getCntrAddr())
+                        .setData(parseHex(encodedHex))
+                        .build();
 
-            // System.out.println("trigger:\n" + trigger);
+        // System.out.println("trigger:\n" + trigger);
 
-            TransactionExtention txnExt = blockingStub.triggerConstantContract(trigger);
-            // System.out.println("txn id => " + toHex(txnExt.getTxid().toByteArray()));
+        TransactionExtention txnExt = blockingStub.triggerConstantContract(trigger);
+        // System.out.println("txn id => " + toHex(txnExt.getTxid().toByteArray()));
 
-            return txnExt;
+        return txnExt;
     }
 
     /**
@@ -1084,5 +1411,5 @@ public class TronClient {
             throw new RuntimeException("Function not found in the contract");
         }
     }
-    
+
 }

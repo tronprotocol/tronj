@@ -1,4 +1,11 @@
-package demo.trc20;
+package demo.smartContract.trc20;
+
+/**
+ * TRC-20 wrapper class functions calling demos.
+ * 
+ * Each demo in the {@code Trc20Demo} class gets the contract from an address, 
+ * and only works if the contract complies with TRC-20 standard.
+ */
 
 import org.tron.tronj.client.TronClient;
 import org.tron.tronj.client.contract.Contract;

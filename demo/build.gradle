@@ -42,16 +42,16 @@ dependencies {
     implementation 'io.grpc:grpc-stub:1.31.0'
     implementation 'io.grpc:grpc-stub:1.31.0'
 
-    // tronj core libs
-    implementation 'org.tron.tronj:abi:0.1.0'
-    // implementation 'org.tron.tronj:client:0.1.0'
-    // implementation 'org.tron.tronj:utils:0.1.0'
     implementation 'io.grpc:grpc-netty-shaded:1.31.0'
     implementation 'io.grpc:grpc-netty:1.31.0'
     implementation 'io.grpc:grpc-protobuf:1.31.0'
+    //json parsing
+    implementation 'com.google.protobuf:protobuf-java-util:3.11.0'
     // For local test
     implementation fileTree(dir:'../client')
     implementation fileTree(dir:'../utils')
+    implementation fileTree(dir:'../abi')
+    implementation "org.bouncycastle:bcprov-jdk15on:1.68"
 }
 
 application {
