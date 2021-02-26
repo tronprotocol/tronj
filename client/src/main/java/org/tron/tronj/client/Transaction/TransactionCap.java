@@ -3,10 +3,14 @@ package org.tron.tronj.client.transaction;
 /**
  * The {@code TransactionCap} class contains a {@code org.tron.tronj.proto.Transaction}
  * instance and the corresponding transaction id.
+ * 
+ * NOT IN USE AT THE MOMENT, MAY BE MODIFIED OR DELETED IN THE FURTURE.
  */
 
 import org.tron.tronj.proto.Chain.Transaction;
 import org.tron.tronj.proto.Response.TransactionExtention;
+
+import com.google.protobuf.ByteString;
 
 public class TransactionCap {
     private Transaction transaction;
