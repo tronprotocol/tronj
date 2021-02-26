@@ -117,8 +117,8 @@ public class SmartContractDemo {
             Transaction signedTxn = c.signTransaction(builder.build());
             System.out.println(signedTxn.toString());
             //broadcast transaction
-            TransactionReturn ret = c.broadcastTransaction(signedTxn);
-            System.out.println("======== Result ========\n" + ret.toString());
+            String ret = c.broadcastTransaction(signedTxn);
+            System.out.println("======== Result ========\n" + ret);
         } catch (Exception e) {
             e.printStackTrace();
         }

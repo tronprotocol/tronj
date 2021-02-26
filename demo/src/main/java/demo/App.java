@@ -121,8 +121,8 @@ public class App {
             TransactionExtention transaction = client.transfer("TLtrDb1udekjDumnrf3EVeke3Q6pHkZxjm", "TP8LKAf3R3FHDAcrQXuwBEWmaGrrUdRvzb", 1_000_000);
             Transaction signedTxn = client.signTransaction(transaction);
             System.out.println(signedTxn.toString());
-            TransactionReturn ret = client.broadcastTransaction(signedTxn);
-            System.out.println("======== Result ========\n" + ret.toString());
+            String ret = client.broadcastTransaction(signedTxn);
+            System.out.println("======== Result ========\n" + ret);
         } catch (Exception e) {
             System.out.println("error: " + e);
         }
@@ -151,8 +151,8 @@ public class App {
                     1000016, 1_000_000);
             Transaction signedTxn = client.signTransaction(transactionExtention);
             System.out.println(signedTxn.toString());
-            TransactionReturn ret = client.broadcastTransaction(signedTxn);
-            System.out.println("======== Result ========\n" + ret.toString());
+            String ret = client.broadcastTransaction(signedTxn);
+            System.out.println("======== Result ========\n" + ret);
         } catch (Exception e) {
             System.out.println("error: " + e);
         }
@@ -180,8 +180,8 @@ public class App {
             TransactionExtention transaction = client.freezeBalance("TLtrDb1udekjDumnrf3EVeke3Q6pHkZxjm", 1_000_000L, 3L,1,"TMmbeRPnFhXC7BPLaF2M1HCsoE4jwZNB7b");
             Transaction signedTxn = client.signTransaction(transaction);
             System.out.println(signedTxn.toString());
-            TransactionReturn ret = client.broadcastTransaction(signedTxn);
-            System.out.println("======== Result ========\n" + ret.toString());
+            String ret = client.broadcastTransaction(signedTxn);
+            System.out.println("======== Result ========\n" + ret);
         } catch (Exception e) {
             System.out.println("error: " + e);
         }
@@ -194,8 +194,8 @@ public class App {
             TransactionExtention transaction = client.unfreezeBalance("TLtrDb1udekjDumnrf3EVeke3Q6pHkZxjm", 1, "TMmbeRPnFhXC7BPLaF2M1HCsoE4jwZNB7b");
             Transaction signedTxn = client.signTransaction(transaction);
             System.out.println(signedTxn.toString());
-            TransactionReturn ret = client.broadcastTransaction(signedTxn);
-            System.out.println("======== Result ========\n" + ret.toString());
+            String ret = client.broadcastTransaction(signedTxn);
+            System.out.println("======== Result ========\n" + ret);
         } catch (Exception e) {
             System.out.println("error: " + e);
         }
@@ -411,8 +411,8 @@ public class App {
             System.out.println(transaction);
             Transaction signedTxn = client.signTransaction(transaction);
             System.out.println(signedTxn.toString());
-            TransactionReturn ret = client.broadcastTransaction(signedTxn);
-            System.out.println("======== Result ========\n" + ret.toString());
+            String ret = client.broadcastTransaction(signedTxn);
+            System.out.println("======== Result ========\n" + ret);
         } catch (Exception e) {
             System.out.println("error: " + e);
         }
@@ -426,8 +426,8 @@ public class App {
             System.out.println(transaction);
             Transaction signedTxn = client.signTransaction(transaction);
             System.out.println(signedTxn.toString());
-            TransactionReturn ret = client.broadcastTransaction(signedTxn);
-            System.out.println("======== Result ========\n" + ret.toString());
+            String ret = client.broadcastTransaction(signedTxn);
+            System.out.println("======== Result ========\n" + ret);
         } catch (Exception e) {
             System.out.println("error: " + e);
         }
@@ -566,8 +566,8 @@ public class App {
             TransactionExtention transaction = client.voteWitness("TLtrDb1udekjDumnrf3EVeke3Q6pHkZxjm",witness);
             Transaction signedTxn = client.signTransaction(transaction);
             System.out.println(signedTxn.toString());
-            TransactionReturn ret = client.broadcastTransaction(signedTxn);
-            System.out.println("======== Result ========\n" + ret.toString());
+            String ret = client.broadcastTransaction(signedTxn);
+            System.out.println("======== Result ========\n" + ret);
         } catch (Exception e) {
             System.out.println("error: " + e);
         }
@@ -595,8 +595,8 @@ public class App {
             Transaction signedTxn = client.signTransaction(builder.build());
             System.out.println(signedTxn.toString());
             //broadcast transaction
-            TransactionReturn ret = client.broadcastTransaction(signedTxn);
-            System.out.println("======== Result ========\n" + ret.toString());
+            String ret = client.broadcastTransaction(signedTxn);
+            System.out.println("======== Result ========\n" + ret);
         } catch (Exception e) {
             System.out.println("error: " + e);
         }
@@ -742,8 +742,8 @@ public class App {
             System.out.println(transaction);
             Transaction signedTxn = client.signTransaction(transaction);
             System.out.println(signedTxn.toString());
-            TransactionReturn ret = client.broadcastTransaction(signedTxn);
-            System.out.println("======== Result ========\n" + ret.toString());
+            String ret = client.broadcastTransaction(signedTxn);
+            System.out.println("======== Result ========\n" + ret);
         } catch (Exception e) {
             System.out.println("error: " + e);
         }
@@ -761,8 +761,8 @@ public class App {
             System.out.println(transaction);
             Transaction signedTxn = client.signTransaction(transaction);
             System.out.println(signedTxn.toString());
-            TransactionReturn ret = client.broadcastTransaction(signedTxn);
-            System.out.println("======== Result ========\n" + ret.toString());
+            String ret = client.broadcastTransaction(signedTxn);
+            System.out.println("======== Result ========\n" + ret);
         } catch (Exception e) {
             System.out.println("error: " + e);
         }
@@ -777,8 +777,8 @@ public class App {
             System.out.println(transaction);
             Transaction signedTxn = client.signTransaction(transaction);
             System.out.println(signedTxn.toString());
-            TransactionReturn ret = client.broadcastTransaction(signedTxn);
-            System.out.println("======== Result ========\n" + ret.toString());
+            String ret = client.broadcastTransaction(signedTxn);
+            System.out.println("======== Result ========\n" + ret);
         } catch (Exception e) {
             System.out.println("error: " + e);
         }
@@ -793,8 +793,8 @@ public class App {
             System.out.println(transaction);
             Transaction signedTxn = client.signTransaction(transaction);
             System.out.println(signedTxn.toString());
-            TransactionReturn ret = client.broadcastTransaction(signedTxn);
-            System.out.println("======== Result ========\n" + ret.toString());
+            String ret = client.broadcastTransaction(signedTxn);
+            System.out.println("======== Result ========\n" + ret);
         } catch (Exception e) {
             System.out.println("error: " + e);
         }
@@ -809,8 +809,8 @@ public class App {
             System.out.println(transaction);
             Transaction signedTxn = client.signTransaction(transaction);
             System.out.println(signedTxn.toString());
-            TransactionReturn ret = client.broadcastTransaction(signedTxn);
-            System.out.println("======== Result ========\n" + ret.toString());
+            String ret = client.broadcastTransaction(signedTxn);
+            System.out.println("======== Result ========\n" + ret);
         } catch (Exception e) {
             System.out.println("error: " + e);
         }
@@ -884,8 +884,8 @@ public class App {
         System.out.println(transaction);
         Transaction signedTxn = client.signTransaction(transaction);
         System.out.println(signedTxn.toString());
-        TransactionReturn ret = client.broadcastTransaction(signedTxn);
-        System.out.println("======== Result ========\n" + ret.toString());
+        String ret = client.broadcastTransaction(signedTxn);
+        System.out.println("======== Result ========\n" + ret);
         } catch (Exception e) {
             System.out.println("error: " + e);
         }
