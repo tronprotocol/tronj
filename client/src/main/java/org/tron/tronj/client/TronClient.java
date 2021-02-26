@@ -1387,11 +1387,20 @@ public class TronClient {
      * @param function contract function.
      * @return TransactionExtention.
      * @throws RuntimeException if function cannot be found in the contract.
+     * @throws 
      */
     public TransactionExtention constantCall(String ownerAddr, String contractAddr, Function function) {
         Contract cntr = getContract(contractAddr);
         if (isFuncInContract(cntr, function)) {
-            return callWithoutBroadcast(ownerAddr, cntr, function);
+            TransactionExtention txnExt = callWithoutBroadcast(ownerAddr, cntr, function);
+            TransactionReturn txnRet = txnExt.getResult();
+            //return if succeeds, otherwise throws exception
+            if (!txnRet.getResult()) {
+                String message = resolveResultCode(txnRet.getCodeValue()) + ", " + txnRet.getMessage();
+                throw new RuntimeException(message);
+            } else {
+                return txnExt;
+            }
         } else {
             throw new RuntimeException("Function not found in the contract");
         }
