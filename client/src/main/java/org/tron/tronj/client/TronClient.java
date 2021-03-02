@@ -1,20 +1,5 @@
 package org.tron.tronj.client;
 
-
-/**
- * A {@code TronClient} object is the entry point for calling the functions.
- *
- *<p>A {@code TronClient} object is bind with a private key and a full node.
- * {@link #broadcastTransaction}, {@link #signTransaction} and other transaction related
- * operations can be done via a {@code TronClient} object.</p>
- *
- * @since jdk13.0.2+8
- * @see org.tron.tronj.client.contract.Contract
- * @see org.tron.tronj.proto.Chain.Transaction
- * @see org.tron.tronj.proto.Contract
- */
-
-
 import com.google.protobuf.InvalidProtocolBufferException;
 import org.tron.tronj.abi.FunctionEncoder;
 import org.tron.tronj.abi.datatypes.Function;
@@ -94,6 +79,36 @@ import org.tron.tronj.proto.Response.TransactionSignWeight;
 import org.tron.tronj.proto.Response.TransactionApprovedList;
 
 import static org.tron.tronj.proto.Response.TransactionReturn.response_code.SUCCESS;
+
+/**
+ * The class {@code TronClient} represents users' entrances. All 
+ * interactions with the TRON public chain, such as {@code signTransaction},
+ * rely on instances of {@code TronClient} to proceed.
+ *
+ * <p>
+ * A TronClient instance works with a binding private key. Resource consumption 
+ * operations on the TRON public chain require private keys. With the binding 
+ * private key, all operations with the TronClient instance are regarded to be done 
+ * by the owner of the private key. For example:
+ * <blockquote><pre>
+ *     TronClient client = TronClient.ofMainnet("any private key");
+ * </pre></blockquote><p>
+ * The instance {@code client} is bound with a private key and it can be 
+ * used to perform private key needed operations:
+ * <blockquote><pre>
+ *     client.signTransaction(transaction);
+ * </pre></blockquote><p>
+ * The {@code transaction} is signed by the binding private key.
+ * <p>
+ * TronClient is not implemented as a singleton, which is easy to control
+ * several accounts at the same time.
+ * <p>
+ * 
+ * @since jdk13.0.2+8
+ * @see org.tron.tronj.client.contract.Contract
+ * @see org.tron.tronj.proto.Chain.Transaction
+ * @see org.tron.tronj.proto.Contract
+ */
 
 public class TronClient {
     public final WalletGrpc.WalletBlockingStub blockingStub;
