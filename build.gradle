@@ -51,10 +51,15 @@ subprojects {
         from javadoc.destinationDir
     }
 
+    task wrapper(type: Wrapper) {
+        gradleVersion = '6.6.1'
+    }
+
     artifacts {
         archives jar
         archives sourcesJar
     }
+
 
     // signing {
     //     useGpgCmd()
