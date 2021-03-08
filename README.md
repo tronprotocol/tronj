@@ -46,7 +46,6 @@ Use maven repo setting from [Bintray](https://bintray.com/beta/#/starsakary/tron
 
 ### Construct Smart Contract Function Demo 
 
-Refer `demo` project.
 
 ```java
 /*
