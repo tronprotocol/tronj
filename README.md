@@ -44,7 +44,6 @@ dependencies {
 
 ### Construct Smart Contract Function Demo 
 
-Refer `demo` project.
 
 ```java
 /*
