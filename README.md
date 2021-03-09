@@ -1,6 +1,8 @@
 # tronj
 
-The TRON client library.
+Tronj is a lightweight SDK that includes libraries for working with TRON system contracts and smart contracts.
+
+Tronj makes it easy to build TRON applications with java.
 
 Tronj document: https://tronjdocument.readthedocs.io/en/latest/
 
@@ -18,16 +20,18 @@ repositories {
 }
 ```
 
-Then add `abi` as dependency.
+Then add required packages as dependencies.
 
 ```groovy
 dependencies {
-    ....
+    // protobuf & grpc
+    implementation 'com.google.protobuf:protobuf-java:3.11.0'
 
-    implementation 'org.tron.tronj:abi:0.1.1'
-    implementation 'org.tron.tronj:client:0.1.1'
+    implementation 'org.tron.tronj:abi:0.1.2'
+    implementation 'org.tron.tronj:client:0.1.2'
+    implementation 'org.tron.tronj:utils:0.1.2'
 
-    ....
+    implementation 'com.google.guava:guava:28.0-jre'
 }
 ```
 
@@ -37,53 +41,93 @@ dependencies {
 <dependency>
   <groupId>org.tron.tronj</groupId>
   <artifactId>abi</artifactId>
-  <version>0.1.1</version>
+  <version>0.1.2</version>
+  <type>pom</type>
+</dependency>
+<dependency>
+  <groupId>org.tron.tronj</groupId>
+  <artifactId>utils</artifactId>
+  <version>0.1.2</version>
+  <type>pom</type>
+</dependency>
+<dependency>
+  <groupId>org.tron.tronj</groupId>
+  <artifactId>client</artifactId>
+  <version>0.1.2</version>
   <type>pom</type>
 </dependency>
 ```
 
-### Construct Smart Contract Function Demo 
+## Signature Verification
 
+Package signature files are uploaded together with .jar files. Packages are signed with GnuPG.
 
-```java
-/*
-import java.math.BigInteger;
-import java.util.*;
+### Install GPG
 
-import FunctionEncoder;
-import org.tron.tronj.abi.datatypes.*;
-import Bytes10;
-import Uint256;
-import Uint32;
-*/
+```Shell
+brew install gnupg
+```
 
+### Get the Public Key
 
-// Function(name, input, output)
-Function function =
-        new Function(
-                "sam",
-                Arrays.asList(
-                        new DynamicBytes("dave".getBytes()),
-                        new Bool(true),
-                        new Address("T9yKC9LCoVvmhaFxKcdK9iL18TUWtyFtjh"),
-                        new DynamicArray<>(
-                                new Uint(BigInteger.ONE),
-                                new Uint(BigInteger.valueOf(2)),
-                                new Uint(BigInteger.valueOf(3)))),
-                Collections.emptyList());
-String encodedHex = FunctionEncoder.encode(function);
+```Shell
+gpg --keyserver keyserver.ubuntu.com --recv-key AD0876A4
+```
 
-/*
-465c405b
-0000000000000000000000000000000000000000000000000000000000000080
-0000000000000000000000000000000000000000000000000000000000000001
-00000000000000000000000000052b08330e05d731e38c856c1043288f7d9744
-00000000000000000000000000000000000000000000000000000000000000c0
-0000000000000000000000000000000000000000000000000000000000000004
-6461766500000000000000000000000000000000000000000000000000000000
-0000000000000000000000000000000000000000000000000000000000000003
-0000000000000000000000000000000000000000000000000000000000000001
-0000000000000000000000000000000000000000000000000000000000000002
-0000000000000000000000000000000000000000000000000000000000000003
-*/
+Alternatively, you may import the public manually from below:
+
+```Text
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+mQGNBF/XiOcBDADUYu9eTQSN9RT86/oMdlEcC4euVrfO+GSXdimJlwXfjJJRYVPy
+zJCRa6ANzIHsXC0x9KkdRCejEjQPafwnqGYat9lSSRx+EjjCqHKzUE4re6MiAHsH
+l9TVGU9BIJQRm03UEK/oF9k9sEZrFgiMe9357p+JAeI4WXtCJMg/G6dRDR1YZlpz
+3+krz0OFFvOe3yJLmoZPvBNoYI4zuIiOI0isQzqRgF0kleA5KLWRmCeQ8DBlrEUx
+/cMKhrozmveGDvVHdYBshYC6msMcdv7OM5QyQCOlShcjqvkC79Q54pI1iq1pYT69
+jXRWPV+AXLyPhIqfbFyBVT5I9dGSUeStaty/moSQ4JkhhjrzrUF/9yHYhi7ryLwC
+68tVtdiZButk/djePhlyXp14wnOu4SbKSPyLkS0j9gmZiizbRZ7SgAAOhTtreGzL
+eSvCmCw59A3KHXApiwQjMulZ4nd1ZVL5e2Td7Mx5ebvNjR0Fw80ti1/OfT0o7Vnn
+nAWd/tBkYJDUT/cAEQEAAbQadHJvbmogPHRyb25qc2RrQGdtYWlsLmNvbT6JAdQE
+EwEIAD4WIQR2wYLB4SafSUwjFf6oJdjW6LSQFgUCX9eI5wIbAwUJA8JnAAULCQgH
+AgYVCgkICwIEFgIDAQIeAQIXgAAKCRCoJdjW6LSQFrKGC/0XeuhgEPJCTIPzoBhn
+079nYZISpSFYrFL6JNwuB4x/3h55CnXAQR+5Pug0Ns9YyRPckoB/S9cD2Y6tNBGy
+UHBgPKz1Knl+HshuBoyqqi/CUDsScI/MZ6oPwJ31iT+j5jtdref5nn0jtzpcX7cu
+41GZJ33IE4e1Xq2W664kZ+Rnfobzed8OsPMFJu/9GG7XwxAW9TLkSeiZdjI3b2KH
+0omoN+d9lOx1F3GlU0BJP1n5d/xUI+B7Uu0v5aozUu2q92QexPSLuqq+uiTf30X8
+81NCzKcvi2x/yIX5u3R1cMKuR3KXPO/N3zYYl45+0/E4d78XFmwgfxwk+7XgkN4d
+6TjTa4CqI2vjhOOUCNaJ0bPMhYi9Btsxm0Sy2xmGJBdx1J1ixc5zY8il2IYkFbLc
+Md4x9ejs2gmEGWXkxCYGxBcK/dfiX/U+/z8vP7ImhlhjvDS1Q2hAxJsJ+Mnss4Gw
+J0BlkCNrRzsvoq8e8m0xT4H/ePnbRtkArZLPQpkwL+5Xzfi5AY0EX9eI5wEMAN5/
+i5Bv/TKgbm80DAGsXXXa3YUAaDJcS3SO/NeRR9mmKR9NUAfIYQhV6//d+FTrDasa
+63NIaCPcKe5ocogVCY2Qb/oenRL1qV6XcvyxkNSMcJhyrPzY0v6bSatUU9yjLzre
+wb8gD4AJT9tGmbpFtvkYA6ndQ0yucPKXvp86WAnuo5Lvn+90SJUzwDySEMsXvDSF
+201t8z7t7HuSM2sI2swIJkCT4x1zS/LBkSZPtP46aP1ShOKd6/L+3KZ5ikfr6351
+FghyVScjkV33Uw4DB8JJRRTvdj8HxahMeNxFYKWCMYDQ5sk00WOfAy9M/8mjqrh6
+0oiQQIxkxN3Vmc9pseORpaXLIJymRJT78jI0QglINsiuZfiYqKfR6ka1VJXu9sQJ
+ZbxgmuL7T7HmTMLZK6f4uwUDX38Udu7CLEhJuNttOq8l1KHoraXf2AtLHyta1MYQ
+5goB8fGPbFf6ehqQLIjLq+EZLIauN/BZHd2mV9U3/PTq+KoscOsiSzewfuj5jwAR
+AQABiQG8BBgBCAAmFiEEdsGCweEmn0lMIxX+qCXY1ui0kBYFAl/XiOcCGwwFCQPC
+ZwAACgkQqCXY1ui0kBauFgwAiq7DPpZGvD1ubmLlATq0fCZbQc7wRiR+Y4EKVbW+
+QWsOYLXMgObbxXMwrk/u0wqyFnIrwt8Vxb7go3ciiw6FihJWRV0aX2JsmQdj4l3t
+OU5GYnp4oVhLga4CgYgXjMLvB+mOmm0lTN8JzVPFcNi6lEA+NLu5LlU/rYlyVoFq
+bjx0phswUKhLFk2wDnu2ndOrnmL1p21+4Byd+bupXhK3kFGmaBfJdUhgt5L6tTuZ
+qjeCXfYtAJrPAd4D0VVL7JbusPI9aYpZGW8vErDJPfvD+FhkXJGxbZ0AIpb7x7AX
+Wvh6Yw6q48n00CAUIut2yWOn0C27YKXQv1G0vmvbjsVP9OxK0VQnZd648Bm8U98o
+g/mQ6FNOVMzFjRk4iWrPl9ExL6RYfw2O+ZeIPTuXngxLJ8erX9i3lclacsiIj74W
+XKGcDnvCACJdJd8DWbiY8OQiNfONye44WD1lTr6f+y3swhnryIl9Hk2Vb1xofWre
+hjMZIEg6d5XYFLRf1iaVG+TD
+=OjmN
+-----END PGP PUBLIC KEY BLOCK-----
+```
+
+### Verify Packages
+
+Download package and the corresponding .asc file, take `abi` as an example:
+
+```Shell
+gpg --verify abi-0.1.2.jar.asc abi-0.1.2.jar
+
+gpg: Signature made Mon Dec 28 11:51:48 2020 CST
+gpg:                using RSA key 76C182C1E1269F494C2315FEA825D8D6E8B49016
+gpg: Good signature from "tronj <tronjsdk@gmail.com>" [ultimate]
 ```
